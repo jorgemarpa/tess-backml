@@ -4,11 +4,39 @@ version = "0.1.0"
 description = ""
 authors = ["Jorge Martinez-Palomera <jorgemarpa@ug.uchile.cl>"]
 readme = "README.md"
+packages = [{include = "tess_backml_td", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">3.10,<4.0"
+numpy = "^2.2.4"
+pandas = "^2.2.3"
+matplotlib = "^3.10.1"
+astropy = "^6"
+tqdm = "^4.67.1"
+scipy = "^1.15.2"
+tesscube = "^1.2.1"
+tessvectors = {git = "https://github.com/tessgi/tessvectors.git"}
 
+[tool.poetry.group.dev.dependencies]
+mkdocs = "^1.6.0"
+mkdocstrings = "^0.25.2"
+mkdocs-material = "^9.5.33"
+ruff = "^0.5.5"
+pytest = "^8.3.2"
+mypy = "^1.11.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+# Assumes Python 3.10
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`), a subset of pycodestyle (`E`) and isort (`I`).
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
