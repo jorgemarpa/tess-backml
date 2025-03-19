@@ -394,8 +394,10 @@ class Background_Data(object):
         )
         return
     
-    def animate_maps(self, step: int=10):
-
+    def animate_flux(self, step: int=10):
+        """
+        Makes an animation of the scatter light cube
+        """
 
         # Create animation
         ani = animate_cube(
@@ -421,7 +423,7 @@ class Background_Data(object):
 
         return
 
-    def animate_flux(self):
+    def animate_maps(self):
         return
     
 
