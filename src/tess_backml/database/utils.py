@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 from matplotlib import animation
-from typing import Callable, Optional, tuple
+from typing import Callable, Optional, Tuple
 from astropy.visualization import simple_norm
 
 
@@ -55,7 +55,7 @@ def plot_img(
     scol_2d: Optional[np.ndarray] = None,
     srow_2d: Optional[np.ndarray] = None,
     plot_type: str = "img",
-    extent: Optional[tuple] = None,
+    extent: Optional[Tuple] = None,
     cbar: bool = True,
     ax: Optional[plt.Axes] = None,
     title: str = "",
@@ -114,7 +114,7 @@ def animate_cube(
     cadenceno: Optional[np.ndarray] = None,
     time: Optional[np.ndarray] = None,
     plot_type: str = "img",
-    extent: Optional[tuple] = None,
+    extent: Optional[Tuple] = None,
     interval: int = 200,
     repeat_delay: int = 1000,
     step: int = 1,
