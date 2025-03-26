@@ -3,6 +3,9 @@ import os
 
 from tess_backml import PACKAGEDIR, Background_Data
 
+import matplotlib
+matplotlib.rcParams['animation.embed_limit'] = 2**128
+
 # import sys
 # from typing import Optional, Union
 
@@ -23,23 +26,27 @@ def build_dataset(
         sector=sector, camera=camera, ccd=ccd, img_bin=img_bin, downsize=downsize
     )
     print(bkg_data)
-    bkg_data.get_flux_data()
-    tess_bkg.get_scatter_light_cube()
-    tess_bkg.get_vector_maps()
+    bkg_data.get_scatter_light_cube(frames=None, mask_straps=True, plot=False)
+    
+    if plot:
+        fig_dir = f"{os.path.dirname(os.path.dirname(PACKAGEDIR))}/data/figures/sector{sector:03}"
+        if not os.path.isdir(fig_dir):
+            os.makedirs(fig_dir)
+        fig_file = (
+            f"{fig_dir}/ffi_scatterlight_bin{bkg_data.img_bin}"
+            f"_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.gif"
+            )
+        print(fig_file)
+        bkg_data.animate_data(data="sl", file_name=fig_file, save=True, step=4)
 
-    fig_dir = f"{PACKAGEDIR}/data/figures/sector{sector:03}"
-    if not os.path.isdir(fig_dir):
-        os.makedirs(fig_dir)
+    bkg_data.get_vector_maps(ang_size=True)
 
-    fig_file = f"{fig_dir}//ffi_flux_bin{bkg_data.img_bin}_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.gif"
-    tess_bkg.animate_flux(file_name=fig_file)
-
-    data_dir = f"{PACKAGEDIR}/data/bkg_data/sector{sector:03}"
+    data_dir = f"{os.path.dirname(os.path.dirname(PACKAGEDIR))}/data/bkg_data/sector{sector:03}"
     if not os.path.isdir(data_dir):
         os.makedirs(data_dir)
-
     out_file = f"{data_dir}/ffi_cube_bin{bkg_data.img_bin}_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.npz"
-    tess_bkg.save_data(out_file=out_file)
+    
+    bkg_data.save_data(out_file=out_file)
 
     return
 

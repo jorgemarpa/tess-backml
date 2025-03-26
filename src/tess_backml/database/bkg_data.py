@@ -10,9 +10,9 @@ from astropy.stats import sigma_clip
 from scipy import ndimage
 import astropy.units as u
 from astropy import constants as const
-from .utils import pooling_2d
+from .utils import pooling_2d, animate_cube
 
-from typing import Optional
+from typing import Optional, Tuple
 from .. import PACKAGEDIR
 
 camccd_orient = {
@@ -179,7 +179,7 @@ class Background_Data(object):
 
         return
     
-    def _get_straps_mask(self):
+    def _get_straps_mask(self, dilat_iter: int = 1):
         """
         Gets straps locations from a file and creates a pixel mask
         """
@@ -188,16 +188,20 @@ class Background_Data(object):
         self.strap_mask = np.zeros((2048, 2048)).astype(bool)
         # the indices in the file are 1-based in the science portion of the ccd
         self.strap_mask[:, straps["Column"].values - 1] = True
+        self.strap_mask = ndimage.binary_dilation(self.strap_mask, iterations=dilat_iter)
 
         return
 
-    def plot_dark_frame(self):
+    def plot_dark_frame(self, mask_straps: bool = False):
         """
         Creates a diagnostic plot of the darkes frame and the star mask
         """
         vmin, vmax = np.percentile(self.ffi_dark.ravel(), [3, 97])
 
-        fig, ax = plt.subplots(1, 2, figsize=(9, 4))
+        if mask_straps:
+            fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+        else:
+            fig, ax = plt.subplots(1, 2, figsize=(9, 4))
         ax[0].set_title("Darkest frame FFI")
         bar = ax[0].imshow(self.ffi_dark, origin="lower", vmin=vmin, vmax=vmax)
         plt.colorbar(bar, ax=ax[0], shrink=0.8, label="Flux [-e/s]")
@@ -206,11 +210,23 @@ class Background_Data(object):
         bar = ax[1].imshow(self.star_mask, origin="lower", vmin=0, vmax=1)
         plt.colorbar(bar, ax=ax[1], shrink=0.8)
 
+        if mask_straps:
+            ax[2].set_title("Strap Mask")
+            bar = ax[2].imshow(self.strap_mask, origin="lower", vmin=0, vmax=1)
+            plt.colorbar(bar, ax=ax[2], shrink=0.8)
+        plt.show()
         return
 
-    def get_flux_data(self, plot: bool = False, mask_straps: bool = False):
+    def get_scatter_light_cube(
+        self, 
+        plot: bool = False, 
+        mask_straps: bool = False, 
+        frames: Optional[Tuple] = None,
+    ):
         """
-        Gets flux cube from MAST/AWS and does downsampling
+        Gets flux cube from MAST/AWS and does downsampling.
+        Subtracts the static scene (from dark frames) to compute the 
+        time-changing scatter light component only.
         """
         # get dark frame
         print("Computing sector darkest frames...")
@@ -222,9 +238,9 @@ class Background_Data(object):
         # mask out straps
         if mask_straps:
             self._get_straps_mask()
-            self.bkg_pixels = ~(self.star_mask & self.strap_mask)
+            self.bkg_pixels &= ~self.strap_mask
         if plot:
-            self.plot_dark_frame()
+            self.plot_dark_frame(mask_straps=mask_straps)
 
         srow = np.arange(
             self.rmin + self.img_bin / 2,
@@ -253,11 +269,23 @@ class Background_Data(object):
         elif self.downsize == "binning":
             # all pixels the binning with seld.
             flux_cube = []
-            for f in tqdm(range(self.tcube.nframes)):
+            self.static = self._get_static_scene()
+            if isinstance(frames, tuple):
+                if len(frames) == 1:
+                    fi, ff, step = 0, frames, 1
+                elif len(frames) == 2:
+                    fi, ff, step = frames[0], frames[1], 1
+                elif len(frames) == 3:
+                    fi, ff, step = frames[0], frames[1], frames[2]
+                frange = range(fi, ff, step)
+            else:
+                frange = range(0, self.nt)
+            for f in tqdm(frange, desc="Iterating frames"):
                 current = self.tcube.get_ffi(f)[1].data[
                     self.rmin : self.rmax, self.cmin : self.cmax
                 ]
-                current[self.bkg_pixels] = np.nan
+                current[~self.bkg_pixels] = np.nan
+                current -= self.static
 
                 flux_cube.append(
                     pooling_2d(
@@ -268,23 +296,34 @@ class Background_Data(object):
                     )
                 )
             flux_cube = np.array(flux_cube)
+            if len(flux_cube) != self.nt:
+                aux = np.zeros((self.nt, flux_cube.shape[1], flux_cube.shape[2]))
+                aux[fi:ff:step] = flux_cube
+                flux_cube = aux
 
         else:
             print("Wrong pixel grid option...")
 
-        self.flux_cube = flux_cube
+        self.scatter_cube = flux_cube
+        # self.static = np.median(flux_cube[self.dark_frames], axis=0)
+        # self.scatter_cube -= self.static
+        
         return
 
-    def get_scatter_light_cube(self):
-        """
-        Removes the mean static scene to the flux cube to obtain the tine changing
-        scatter light signal only.
-        """
-        static = np.median(self.flux_cube[self.dark_frames], axis=0)
-        self.scatter_cube = self.flux_cube - static
-        return
 
-    def _get_object_vectors(self, object: str = "Earth"):
+    def _get_static_scene(self):
+        """
+        Computes a static scene of the cube by averaging the top 10 darkest frames
+        """
+        print("Computing average static scene from darkes frames...")
+        static = np.median([self.tcube.get_ffi(f)[1].data[
+                self.rmin : self.rmax, self.cmin : self.cmax
+            ] for f in self.dark_frames], axis=0)
+        
+        return static
+    
+
+    def _get_object_vectors(self, object: str = "Earth", ang_size: bool = True):
         """
         Auxiliar function to get vector maps for an object
         """
@@ -355,59 +394,64 @@ class Background_Data(object):
             aux_az = np.rad2deg(np.arcsin(aux_az)).value + 180
             object_az_map.append(aux_az)
 
-            ang_dist = np.sqrt(grid_row**2 + grid_col**2) * u.pixel * tess_pscale
+            ang_dist = np.sqrt(grid_row**2 + grid_col**2) * u.pixel * self.tess_pscale
             pix_dist = (np.sqrt(grid_row**2 + grid_col**2) * 15 * u.micrometer).to("m")
             aux_dist = dist.to("m") * np.cos(ang_dist.to("rad"))
 
             aux_dist += np.sqrt(
                 pix_dist**2 + (dist.to("m") * np.sin(ang_dist.to("rad"))) ** 2
             ) * np.sign(grid_row_d)
+            aux_dist[aux_dist.value < 1000] = 0
+            if ang_size:
+                aux_dist = 2 * np.arctan(const.R_earth.to("m") / (2 * aux_dist))
+                aux_dist = aux_dist.to("deg").value
+                aux_dist[aux_dist.value == 180] = np.nan
             object_dist_map.append(aux_dist)
 
         # we need to flip the value maps to account for cam/CCD orientations
-        if camera in [1, 2]:
-            if ccd == 1:
+        if self.camera in [1, 2]:
+            if self.ccd == 1:
                 object_alt_map = np.flip(np.array(object_alt_map), axis=1)
                 object_alt_map = np.flip(np.array(object_alt_map), axis=2)
                 object_az_map = np.flip(np.array(object_az_map), axis=1)
                 object_az_map = np.flip(np.array(object_az_map), axis=2)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=1)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=2)
-            if ccd == 2:
+            if self.ccd == 2:
                 object_alt_map = np.flip(np.array(object_alt_map), axis=1)
                 object_az_map = np.flip(np.array(object_az_map), axis=1)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=1)
-            if ccd == 3:
-                object_alt_map = np.flip(np.array(object_alt_map), axis=1)
-                object_alt_map = np.flip(np.array(object_alt_map), axis=2)
-                object_az_map = np.flip(np.array(object_az_map), axis=1)
-                object_az_map = np.flip(np.array(object_az_map), axis=2)
-                object_dist_map = np.flip(np.array(object_dist_map), axis=1)
-                object_dist_map = np.flip(np.array(object_dist_map), axis=2)
-            if ccd == 4:
-                object_alt_map = np.flip(np.array(object_alt_map), axis=1)
-                object_az_map = np.flip(np.array(object_az_map), axis=1)
-                object_dist_map = np.flip(np.array(object_dist_map), axis=1)
-        if camera in [3, 4]:
-            if ccd == 3:
+            if self.ccd == 3:
                 object_alt_map = np.flip(np.array(object_alt_map), axis=1)
                 object_alt_map = np.flip(np.array(object_alt_map), axis=2)
                 object_az_map = np.flip(np.array(object_az_map), axis=1)
                 object_az_map = np.flip(np.array(object_az_map), axis=2)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=1)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=2)
-            if ccd == 4:
+            if self.ccd == 4:
                 object_alt_map = np.flip(np.array(object_alt_map), axis=1)
                 object_az_map = np.flip(np.array(object_az_map), axis=1)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=1)
-            if ccd == 1:
+        if self.camera in [3, 4]:
+            if self.ccd == 3:
                 object_alt_map = np.flip(np.array(object_alt_map), axis=1)
                 object_alt_map = np.flip(np.array(object_alt_map), axis=2)
                 object_az_map = np.flip(np.array(object_az_map), axis=1)
                 object_az_map = np.flip(np.array(object_az_map), axis=2)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=1)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=2)
-            if ccd == 2:
+            if self.ccd == 4:
+                object_alt_map = np.flip(np.array(object_alt_map), axis=1)
+                object_az_map = np.flip(np.array(object_az_map), axis=1)
+                object_dist_map = np.flip(np.array(object_dist_map), axis=1)
+            if self.ccd == 1:
+                object_alt_map = np.flip(np.array(object_alt_map), axis=1)
+                object_alt_map = np.flip(np.array(object_alt_map), axis=2)
+                object_az_map = np.flip(np.array(object_az_map), axis=1)
+                object_az_map = np.flip(np.array(object_az_map), axis=2)
+                object_dist_map = np.flip(np.array(object_dist_map), axis=1)
+                object_dist_map = np.flip(np.array(object_dist_map), axis=2)
+            if self.ccd == 2:
                 object_alt_map = np.flip(np.array(object_alt_map), axis=1)
                 object_az_map = np.flip(np.array(object_az_map), axis=1)
                 object_dist_map = np.flip(np.array(object_dist_map), axis=1)
@@ -424,17 +468,17 @@ class Background_Data(object):
         angles and distances  with respect to each camera. Then computes maps with
         values for the angles and distance for each pixel in the downsize cube.
         """
-        self.vectors = tessvectors.getvector(("FFI", sector, camera))
+        self.vectors = tessvectors.getvector(("FFI", self.sector, self.camera))
 
         self.earth_maps = self._get_object_vectors(object="Earth")
         self.earth_vectors = {
-            "dist": (self.vectors["Earth_Distance"] * const.R_earth).to("km").value,
+            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("km").value,
             "alt": self.vectors["Earth_Camera_Angle"],
             "az": self.vectors["Earth_Camera_Azimuth"],
         }
         self.moon_maps = self._get_object_vectors(object="Moon")
         self.moon_vectors = {
-            "dist": (self.vectors["Earth_Distance"] * const.R_earth).to("km").value,
+            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("km").value,
             "alt": self.vectors["Earth_Camera_Angle"],
             "az": self.vectors["Earth_Camera_Azimuth"],
         }
@@ -443,17 +487,17 @@ class Background_Data(object):
 
     def time_bin(self):
         """
-        Inplace binning of the cube in the time axis.
+        Inplace binning of the data cubes in the time axis.
         """
         # bin in time if asked
         if self.time_bin > 1:
             indices = np.array_split(np.arange(self.nt), int(self.nt / self.time_bin))
 
-            self.flux_cube = np.array(
-                [np.nanmedian(self.flux_cube[x], axis=0) for x in indices]
+            self.scatter_cube = np.array(
+                [np.nanmedian(self.scatter_cube[x], axis=0) for x in indices]
             )
-            self.time_bin = np.array([np.mean(self.times[x], axis=0) for x in indices])
-            self.cadenceno_bin = np.array(
+            self.time = np.array([np.mean(self.times[x], axis=0) for x in indices])
+            self.cadenceno = np.array(
                 [np.mean(self.cadenceno[x], axis=0) for x in indices]
             )
 
@@ -482,7 +526,8 @@ class Background_Data(object):
         np.savez(
             out_file,
             scatter_cube=self.scatter_cube,
-            time=self.sime,
+            time=self.time,
+            cadenceno=self.cadenceno,
             earth_alt=self.earth_vectors["alt"],
             earth_az=self.earth_vectors["az"],
             earth_dist=self.earth_vectors["dist"],
@@ -498,31 +543,39 @@ class Background_Data(object):
         )
         return
 
-    def animate_flux(
+    def animate_data(
         self,
+        data: str = "sl",
         step: int = 10,
         file_name: Optional[str] = None,
+        save: bool = False,
     ):
         """
         Makes an animation of the scatter light cube
         """
+        if data == "sl":
+            plot_cube = self.scatter_cube
+            title = "Scatter Light"
+        else:
+            raise ValueError("`cube` must be une of [sl, bkg].")
 
         # Create animation
         ani = animate_cube(
-            self.scatter_cube,
-            cadenceno=self.cadence_number,
+            plot_cube,
+            cadenceno=self.cadenceno,
             time=self.time,
+            interval=50,
             plot_type="img",
             extent=(self.cmin - 0.5, self.cmax - 0.5, self.rmin - 0.5, self.rmax - 0.5),
             step=step,
-            suptitle=f"Scatter Light Sector {self.sector} Camera {self.camera} CCD {self.ccd}",
+            suptitle=f"{title} Sector {self.sector} Camera {self.camera} CCD {self.ccd}",
         )
 
         # Save animation
         if save:
             # Create default file name
             if file_name is None:
-                file_name = f"../../data/ffi_scatlight_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.gif"
+                file_name = f"../../data/ffi_{data}_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.gif"
             # Check format of file_name and outdir
             if not file_name.endswith(".gif"):
                 raise ValueError(f"`file_name` must be a .gif file. Not `{file_name}`")

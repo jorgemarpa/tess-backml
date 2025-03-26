@@ -1,4 +1,7 @@
 notebooks/.ipynb_checkpoints
-# data
+data/figures/sector*
+data/bkg_data
 .DS_Store
 *__pycache__/
+*.ipynb_checkpoints
+data/figures/.ipynb_checkpoints
