@@ -6,12 +6,19 @@ import logging
 import os
 
 __version__ = "0.1.0"
+PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
 
 # Configure logging
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler())
+def get_logger():
+    """
+    Creates a logger
+    """
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+    return logger
 
-PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
+log = get_logger()
 
 from .database import *
 

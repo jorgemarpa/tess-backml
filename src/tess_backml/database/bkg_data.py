@@ -523,30 +523,40 @@ class Background_Data(object):
 
         return
 
-    def save_data(self, out_file: Optional[str] = None):
+    def save_data(self, out_file: Optional[str] = None, save_maps: bool = False):
         """
         Save data to disk
         """
         if out_file is None:
-            out_file = f"../../data/ffi_cube_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.npz"
-        np.savez(
-            out_file,
-            scatter_cube=self.scatter_cube,
-            time=self.time,
-            cadenceno=self.cadenceno,
-            earth_alt=self.earth_vectors["alt"],
-            earth_az=self.earth_vectors["az"],
-            earth_dist=self.earth_vectors["dist"],
-            moon_alt=self.moon_vectors["alt"],
-            moon_az=self.moon_vectors["az"],
-            moon_dist=self.moon_vectors["dist"],
-            earth_alt_map=self.earth_maps["alt"],
-            earth_az_map=self.earth_maps["az"],
-            earth_dist_map=self.earth_maps["dist"],
-            moon_alt_map=self.moon_maps["alt"],
-            moon_az_map=self.moon_maps["az"],
-            moon_dist_map=self.moon_maps["dist"],
-        )
+            out_file = f"./ffi_cube_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.npz"
+            print(f"Saving to {out_file}")
+
+        if save_maps:
+            np.savez(
+                out_file,
+                scatter_cube=self.scatter_cube,
+                time=self.time,
+                cadenceno=self.cadenceno,
+                earth_alt=self.earth_vectors["alt"],
+                earth_az=self.earth_vectors["az"],
+                earth_dist=self.earth_vectors["dist"],
+                moon_alt=self.moon_vectors["alt"],
+                moon_az=self.moon_vectors["az"],
+                moon_dist=self.moon_vectors["dist"],
+                earth_alt_map=self.earth_maps["alt"],
+                earth_az_map=self.earth_maps["az"],
+                earth_dist_map=self.earth_maps["dist"],
+                moon_alt_map=self.moon_maps["alt"],
+                moon_az_map=self.moon_maps["az"],
+                moon_dist_map=self.moon_maps["dist"],
+            )
+        else:
+            np.savez(
+                out_file,
+                scatter_cube=self.scatter_cube,
+                time=self.time,
+                cadenceno=self.cadenceno,
+            )
         return
 
     def animate_data(
