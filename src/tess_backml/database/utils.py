@@ -9,7 +9,7 @@ def pooling_2d(
     input_array: np.ndarray,
     kernel_size: int = 4,
     stride: int = 4,
-    stat: Callable = np.mean,
+    stat: Callable = np.nanmedian,
 ) -> np.ndarray:
     """
     Performs 2D pooling on the input array.
@@ -31,23 +31,21 @@ def pooling_2d(
     np.ndarray
         A 2D numpy array representing the pooled output.
     """
-
     if input_array.ndim != 2:
         raise ValueError("Input array must be 2D.")
 
     input_height, input_width = input_array.shape
+    
     output_height = (input_height - kernel_size) // stride + 1
     output_width = (input_width - kernel_size) // stride + 1
-    output_array = np.zeros((output_height, output_width))
     
-    for i in range(output_height):
-        for j in range(output_width):
-            start_i = i * stride
-            start_j = j * stride
-            end_i = start_i + kernel_size
-            end_j = start_j + kernel_size
-            output_array[i, j] = stat(input_array[start_i:end_i, start_j:end_j])
-            
+    shape_view = (output_height, output_width, kernel_size, kernel_size)
+    strides_view = (input_array.strides[0] * stride, input_array.strides[1] * stride, input_array.strides[0], 
+                    input_array.strides[1])
+    
+    window_view = np.lib.stride_tricks.as_strided(input_array, shape=shape_view, strides=strides_view)
+    
+    output_array = stat(window_view, axis=(2, 3))
     return output_array
 
 def plot_img(
@@ -62,6 +60,7 @@ def plot_img(
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     cnorm: Optional = None,
+    bar_label: str = "Flux [e-/s]",
 ):
     # Initialise ax
     if ax is None:
@@ -96,7 +95,7 @@ def plot_img(
             extent=extent,
         )
     if cbar:
-        plt.colorbar(im, location="right", shrink=0.8, label="Flux [e-/s]")
+        plt.colorbar(im, location="right", shrink=0.8, label=bar_label)
 
     ax.set_aspect("equal", "box")
     ax.set_title(title)
@@ -119,6 +118,7 @@ def animate_cube(
     repeat_delay: int = 1000,
     step: int = 1,
     suptitle: str = "",
+    bar_label: str = "Flux [e-/s]",
 ):
     # Initialise figure and set title
     fig, ax = plt.subplots(figsize=(7, 7))
@@ -139,6 +139,7 @@ def animate_cube(
         ax=ax,
         title=f"CAD {cadenceno[nt]} | BTJD {time[nt]:.4f}",
         cnorm=norm,
+        bar_label=bar_label,
     )
 
     # Define function for animation
@@ -154,6 +155,7 @@ def animate_cube(
             ax=ax,
             title=f"CAD {cadenceno[nt]} | BTJD {time[nt]:.4f}",
             cnorm=norm,
+            bar_label=bar_label,
         )
 
         return ()

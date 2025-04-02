@@ -270,6 +270,7 @@ class Background_Data(object):
             # all pixels the binning with seld.
             flux_cube = []
             self.static = self._get_static_scene()
+            mask_pixels = ~self.bkg_pixels
             if isinstance(frames, tuple):
                 if len(frames) == 1:
                     fi, ff, step = 0, frames, 1
@@ -284,7 +285,7 @@ class Background_Data(object):
                 current = self.tcube.get_ffi(f)[1].data[
                     self.rmin : self.rmax, self.cmin : self.cmax
                 ]
-                current[~self.bkg_pixels] = np.nan
+                current[mask_pixels] = np.nan
                 current -= self.static
 
                 flux_cube.append(
@@ -405,7 +406,7 @@ class Background_Data(object):
             if ang_size:
                 aux_dist = 2 * np.arctan(const.R_earth.to("m") / (2 * aux_dist))
                 aux_dist = aux_dist.to("deg").value
-                aux_dist[aux_dist.value == 180] = np.nan
+                aux_dist[aux_dist == 180] = np.nan
             object_dist_map.append(aux_dist)
 
         # we need to flip the value maps to account for cam/CCD orientations
@@ -462,7 +463,7 @@ class Background_Data(object):
             "az": np.array(object_az_map),
         }
 
-    def get_vector_maps(self):
+    def get_vector_maps(self, ang_size: bool = True):
         """
         Gets the tess space raft vectors using `tessvetors` which have the Earth/Moon
         angles and distances  with respect to each camera. Then computes maps with
@@ -470,18 +471,23 @@ class Background_Data(object):
         """
         self.vectors = tessvectors.getvector(("FFI", self.sector, self.camera))
 
-        self.earth_maps = self._get_object_vectors(object="Earth")
+        self.earth_maps = self._get_object_vectors(object="Earth", ang_size=ang_size)
         self.earth_vectors = {
             "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("km").value,
-            "alt": self.vectors["Earth_Camera_Angle"],
-            "az": self.vectors["Earth_Camera_Azimuth"],
+            "alt": self.vectors["Earth_Camera_Angle"].values,
+            "az": self.vectors["Earth_Camera_Azimuth"].values,
         }
-        self.moon_maps = self._get_object_vectors(object="Moon")
+        self.moon_maps = self._get_object_vectors(object="Moon", ang_size=ang_size)
         self.moon_vectors = {
             "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("km").value,
-            "alt": self.vectors["Earth_Camera_Angle"],
-            "az": self.vectors["Earth_Camera_Azimuth"],
+            "alt": self.vectors["Earth_Camera_Angle"].values,
+            "az": self.vectors["Earth_Camera_Azimuth"].values,
         }
+        if ang_size:
+            self.earth_vectors["dist"] = 2 * np.arctan(const.R_earth.to("km").value / (2 * self.earth_vectors["dist"]))
+            self.earth_vectors["dist"] *= 180. / np.pi
+            self.moon_vectors["dist"] = 2 * np.arctan(const.R_earth.to("km").value / (2 * self.moon_vectors["dist"]))
+            self.moon_vectors["dist"] *= 180. / np.pi
 
         return
 
@@ -556,6 +562,19 @@ class Background_Data(object):
         if data == "sl":
             plot_cube = self.scatter_cube
             title = "Scatter Light"
+            cbar_label = "Flux [e-/s]",
+        elif data in ["earth_alt", "earth_elev"]:
+            plot_cube = self.earth_maps["alt"] / self.earth_vectors["alt"][:, None, None]
+            title = "Earth Elevation Angle"
+            cbar_label = "Angle [nor,alized]"
+        elif data == "earth_az":
+            plot_cube = self.earth_maps["az"] / self.earth_vectors["az"][:, None, None]
+            title = "Earth Azimuth Angle"
+            cbar_label = "Angle [nor,alized]"
+        elif data == "earth_dist":
+            plot_cube = self.earth_maps["dist"] / self.earth_vectors["dist"][:, None, None]
+            title = "Earth Angular Size"
+            cbar_label = "Angular Size [nor,alized]"
         else:
             raise ValueError("`cube` must be une of [sl, bkg].")
 
@@ -569,13 +588,14 @@ class Background_Data(object):
             extent=(self.cmin - 0.5, self.cmax - 0.5, self.rmin - 0.5, self.rmax - 0.5),
             step=step,
             suptitle=f"{title} Sector {self.sector} Camera {self.camera} CCD {self.ccd}",
+            bar_label=cbar_label,
         )
 
         # Save animation
         if save:
             # Create default file name
             if file_name is None:
-                file_name = f"../../data/ffi_{data}_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.gif"
+                file_name = f"./ffi_{data}_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.gif"
             # Check format of file_name and outdir
             if not file_name.endswith(".gif"):
                 raise ValueError(f"`file_name` must be a .gif file. Not `{file_name}`")
