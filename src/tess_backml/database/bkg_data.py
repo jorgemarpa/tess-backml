@@ -79,6 +79,7 @@ class Background_Data(object):
         """
         self.rmin, self.rmax = 0, 2048
         self.cmin, self.cmax = 45, 2093
+        self.btjd0 = 2457000
 
         if not sector in range(1, 100):
             raise ValueError("Sector must be a valid number between 1 and 100")
@@ -103,7 +104,7 @@ class Background_Data(object):
         self.tess_psize = 15 * u.micrometer
 
         self.tcube = TESSCube(sector=sector, camera=camera, ccd=ccd)
-        self.time = self.tcube.time
+        self.time = self.tcube.time + self.btjd0
         self.cadenceno = self.tcube.cadence_number
         self.nt = len(self.time)
         self.ffi_size = 2048
