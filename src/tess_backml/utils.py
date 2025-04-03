@@ -3,7 +3,7 @@ from typing import Callable, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 from astropy.visualization import simple_norm
-from matplotlib import animation, colors, axes
+from matplotlib import animation, axes, colors
 
 
 def pooling_2d(
