@@ -19,11 +19,11 @@ tessvectors = {git = "https://github.com/jorgemarpa/tessvectors.git", branch="as
 
 [tool.poetry.group.dev.dependencies]
 mkdocs = "^1.6.0"
-mkdocstrings = "^0.25.2"
-mkdocs-material = "^9.5.33"
+mkdocs-material = "^9.5.0"
+mkdocstrings = {version = "^0.29.0", extras = ["python", "numpy-style"]}
+mkdocs-jupyter = "^0.25.1"
 ruff = "^0.5.5"
 pytest = "^8.3.2"
-mypy = "^1.11.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -40,3 +40,4 @@ select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.mypy]
 plugins = "numpy.typing.mypy_plugin"
+disable_error_code = ["import-untyped"]

@@ -20,6 +20,6 @@ def get_logger():
 
 log = get_logger()
 
-from .database import *
+from .bkg_data import BackgroundCube  # noqa
 
-__all__ = ["Background_Data"]
+__all__ = ["BackgroundCube"]

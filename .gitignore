@@ -1,7 +1,14 @@
 notebooks/.ipynb_checkpoints
 data/figures/sector*
 data/bkg_data
+data/cubes
 .DS_Store
-*__pycache__/
 *.ipynb_checkpoints
 data/figures/.ipynb_checkpoints
+.python-version
+site
+dist
+*__pycache__
+.pytest_cache
+.ruff_cache
+.mypy_cache

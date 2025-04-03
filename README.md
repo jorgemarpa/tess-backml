@@ -7,7 +7,7 @@ model that predicts the TESS Full Frame Image (FFI) background signal, in partic
 This animation shows the scattered light of a TESS FFI. The original 2048 x 2048 pixel 
 image was downsized to 128 x 128 pixels to be memory efficient.
 
-![scatt_cube](./data/figures/ffi_scatterlight_bin16_sector001_3-4.gif)
+![scatt_cube](./docs/figures/ffi_scatterlight_bin16_sector001_3-4.gif)
 
 
 The next figure shows the vector maps (distance, elevation, and azimuth angles) for 
@@ -15,7 +15,7 @@ Earth with respect to the camera boresight.
 Note that the distance maps have a discontinuity between the upper and lower CCDs 
 that needs to be fixed.
 
-![earth_maps](./data/figures/earth_vector_maps.png)
+![earth_maps](./docs/figures/earth_vector_maps.png)
 
 To get the data follow the steps:
 

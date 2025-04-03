@@ -1,16 +1,10 @@
 import argparse
 import os
 
-from tess_backml import PACKAGEDIR, Background_Data
-
 import matplotlib
+from tess_backml import PACKAGEDIR, BackgroundCube
+
 matplotlib.rcParams['animation.embed_limit'] = 2**128
-
-# import sys
-# from typing import Optional, Union
-
-# import numpy as np
-# import pandas as pd
 
 
 def build_dataset(
@@ -22,7 +16,7 @@ def build_dataset(
     downsize: str = "binning",
     plot: bool = False,
 ):
-    bkg_data = Background_Data(
+    bkg_data = BackgroundCube(
         sector=sector, camera=camera, ccd=ccd, img_bin=img_bin, downsize=downsize
     )
     print(bkg_data)
