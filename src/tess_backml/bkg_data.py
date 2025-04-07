@@ -676,6 +676,8 @@ class BackgroundCube(object):
         if out_file is None:
             out_file = f"./ffi_cubes_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.npz"
             print(f"Saving to {out_file}")
+            if save_maps:
+                out_file = out_file.replace("cubes", "sl")
 
         if save_maps:
             np.savez(
@@ -697,7 +699,6 @@ class BackgroundCube(object):
                 moon_dist_map=self.moon_maps["dist"],
             )
         else:
-            out_file = out_file.replace("cube", "sl")
             np.savez(
                 out_file,
                 scatter_cube=self.scatter_cube,
