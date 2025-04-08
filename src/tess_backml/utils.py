@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.visualization import simple_norm
 from matplotlib import animation, axes, colors
+from scipy.interpolate import griddata
+from tqdm import tqdm
 
 
 def pooling_2d(
@@ -48,6 +50,33 @@ def pooling_2d(
     
     output_array = stat(window_view, axis=(2, 3))
     return output_array
+
+def fill_nans_interp(cube, deg=3):
+    print("Linear modeling method")
+    x, y = np.arange(cube.shape[2], dtype=float), np.arange(cube.shape[1], dtype=float)
+    x = (x - np.median(x)) / np.std(x)
+    y = (y - np.median(y)) / np.std(y)
+    xx, yy = np.meshgrid(x, y)
+    DM = np.vstack(
+        [
+            yy.ravel() ** idx * xx.ravel() ** jdx
+            for idx in range(deg + 1)
+            for jdx in range(deg + 1)
+        ]
+    ).T
+    print(DM.shape)
+    print(cube.shape)
+    mask = ~np.isnan(cube[0]).ravel()
+    print((~mask).sum())
+
+    filled = []
+    for idx in tqdm(range(len(cube))):
+        array = cube[idx].ravel().copy()
+        ws = np.linalg.solve(DM[mask].T.dot(DM[mask]), DM[mask].T.dot(array[mask]))
+        array[~mask] = DM[~mask].dot(ws)
+        filled.append(array.reshape(xx.shape))
+
+    return np.array(filled)
 
 def plot_img(
     img: np.ndarray,

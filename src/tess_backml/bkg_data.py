@@ -13,7 +13,7 @@ from tesscube import TESSCube
 from tqdm import tqdm
 
 from . import PACKAGEDIR
-from .utils import animate_cube, pooling_2d
+from .utils import animate_cube, pooling_2d, fill_nans_interp
 
 camccd_orient = {
     "cam1": {
@@ -370,15 +370,14 @@ class BackgroundCube(object):
                 ]
                 current[mask_pixels] = np.nan
                 current -= self.static
-
-                flux_cube.append(
-                    pooling_2d(
+                current = pooling_2d(
                         current,
                         kernel_size=self.img_bin,
                         stride=self.img_bin,
                         stat=np.nanmedian,
                     )
-                )
+
+                flux_cube.append(current)
             flux_cube = np.array(flux_cube)
             if len(flux_cube) != self.nt:
                 aux = np.zeros((self.nt, flux_cube.shape[1], flux_cube.shape[2]))
@@ -388,9 +387,11 @@ class BackgroundCube(object):
         else:
             print("Wrong pixel grid option...")
 
+        if np.isnan(flux_cube).any():
+            print("Filling nans with interpolation...")
+            flux_cube = fill_nans_interp(flux_cube)
+
         self.scatter_cube = flux_cube
-        # self.static = np.median(flux_cube[self.dark_frames], axis=0)
-        # self.scatter_cube -= self.static
         
         return
 
