@@ -1,5 +1,6 @@
 import os
 import pickle
+import warnings
 from typing import Optional, Tuple
 
 import astropy.units as u
@@ -15,6 +16,8 @@ from tqdm import tqdm
 
 from . import PACKAGEDIR, log
 from .utils import animate_cube, fill_nans_interp, has_bit, pooling_2d
+
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 camccd_orient = {
     "cam1": {
@@ -724,14 +727,14 @@ class BackgroundCube(object):
             np.savez(
                 out_file,
                 scatter_cube=self.scatter_cube,
-                time=self.time,
-                cadenceno=self.cadenceno,
-                earth_alt=self.earth_vectors["alt"],
-                earth_az=self.earth_vectors["az"],
-                earth_dist=self.earth_vectors["dist"],
-                moon_alt=self.moon_vectors["alt"],
-                moon_az=self.moon_vectors["az"],
-                moon_dist=self.moon_vectors["dist"],
+                time=self.time[~self.quality],
+                cadenceno=self.cadenceno[~self.quality],
+                earth_alt=self.earth_vectors["alt"][~self.quality],
+                earth_az=self.earth_vectors["az"][~self.quality],
+                earth_dist=self.earth_vectors["dist"][~self.quality],
+                moon_alt=self.moon_vectors["alt"][~self.quality],
+                moon_az=self.moon_vectors["az"][~self.quality],
+                moon_dist=self.moon_vectors["dist"][~self.quality],
                 earth_alt_map=self.earth_maps["alt"],
                 earth_az_map=self.earth_maps["az"],
                 earth_dist_map=self.earth_maps["dist"],

@@ -42,7 +42,7 @@ def build_dataset(
 
     log.info(f"Saving cubes to {out_file}")
     bkg_data.save_data(out_file=out_file, save_maps=True)
-
+    log.info("Done!")
     return
 
 
