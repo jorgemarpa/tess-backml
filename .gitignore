@@ -13,3 +13,4 @@ dist
 .ruff_cache
 .mypy_cache
 data/cubes
+notebooks/data
