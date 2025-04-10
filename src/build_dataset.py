@@ -2,7 +2,7 @@ import argparse
 import os
 
 import matplotlib
-from tess_backml import PACKAGEDIR, BackgroundCube, log
+from tess_backml import BackgroundCube, log
 
 matplotlib.rcParams['animation.embed_limit'] = 2**128
 
@@ -15,6 +15,7 @@ def build_dataset(
     # time_bin: int = 1,
     downsize: str = "binning",
     plot: bool = False,
+    out_dir: str= "./",
 ):
     bkg_data = BackgroundCube(
         sector=sector, camera=camera, ccd=ccd, img_bin=img_bin, downsize=downsize
@@ -23,7 +24,7 @@ def build_dataset(
     bkg_data.get_scatter_light_cube(frames=None, mask_straps=True, plot=False)
     
     if plot:
-        fig_dir = f"{os.path.dirname(os.path.dirname(PACKAGEDIR))}/data/figures/sector{sector:03}"
+        fig_dir = f"{out_dir}/figures/sector{sector:03}"
         if not os.path.isdir(fig_dir):
             os.makedirs(fig_dir)
         fig_file = (
@@ -35,7 +36,7 @@ def build_dataset(
 
     bkg_data.get_vector_maps(ang_size=True)
 
-    data_dir = f"{os.path.dirname(os.path.dirname(PACKAGEDIR))}/data/cubes/sector{sector:03}"
+    data_dir = f"{out_dir}/cubes/sector{sector:03}"
     if not os.path.isdir(data_dir):
         os.makedirs(data_dir)
     out_file = f"{data_dir}/ffi_cubes_bin{bkg_data.img_bin}_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.npz"
@@ -93,6 +94,13 @@ if __name__ == "__main__":
         default=False,
         help="Plot target light curve.",
     )
+    parser.add_argument(
+        "--out-dir",
+        dest="out_dir",
+        type=str,
+        default="./",
+        help="Outputh directory path where files and figures will be saved.",
+    )
 
     args = parser.parse_args()
 
@@ -105,4 +113,5 @@ if __name__ == "__main__":
         img_bin=args.img_bin,
         downsize=args.downsize,
         plot=args.plot,
+        out_dir=args.out_dir,
     )
