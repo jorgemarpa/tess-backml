@@ -14,7 +14,7 @@ from tesscube import TESSCube
 from tqdm import tqdm
 
 from . import PACKAGEDIR, log
-from .utils import animate_cube, pooling_2d, fill_nans_interp, has_bit
+from .utils import animate_cube, fill_nans_interp, has_bit, pooling_2d
 
 camccd_orient = {
     "cam1": {

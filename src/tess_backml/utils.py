@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.visualization import simple_norm
 from matplotlib import animation, axes, colors
-from scipy.interpolate import griddata
 from tqdm import tqdm
 
 
