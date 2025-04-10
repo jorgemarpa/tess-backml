@@ -2,7 +2,7 @@ import argparse
 import os
 
 import matplotlib
-from tess_backml import PACKAGEDIR, BackgroundCube
+from tess_backml import PACKAGEDIR, BackgroundCube, log
 
 matplotlib.rcParams['animation.embed_limit'] = 2**128
 
@@ -19,7 +19,7 @@ def build_dataset(
     bkg_data = BackgroundCube(
         sector=sector, camera=camera, ccd=ccd, img_bin=img_bin, downsize=downsize
     )
-    print(bkg_data)
+    log.info(bkg_data)
     bkg_data.get_scatter_light_cube(frames=None, mask_straps=True, plot=False)
     
     if plot:
@@ -30,17 +30,18 @@ def build_dataset(
             f"{fig_dir}/ffi_scatterlight_bin{bkg_data.img_bin}"
             f"_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.gif"
             )
-        print(fig_file)
-        bkg_data.animate_data(data="sl", file_name=fig_file, save=True, step=4)
+        log.info(f"Saving animation to {fig_file}")
+        bkg_data.animate_data(data="sl", file_name=fig_file, save=True, step=10)
 
     bkg_data.get_vector_maps(ang_size=True)
 
-    data_dir = f"{os.path.dirname(os.path.dirname(PACKAGEDIR))}/data/bkg_data/sector{sector:03}"
+    data_dir = f"{os.path.dirname(os.path.dirname(PACKAGEDIR))}/data/cubes/sector{sector:03}"
     if not os.path.isdir(data_dir):
         os.makedirs(data_dir)
-    out_file = f"{data_dir}/ffi_cube_bin{bkg_data.img_bin}_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.npz"
-    
-    bkg_data.save_data(out_file=out_file)
+    out_file = f"{data_dir}/ffi_cubes_bin{bkg_data.img_bin}_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.npz"
+
+    log.info(f"Saving cubes to {out_file}")
+    bkg_data.save_data(out_file=out_file, save_maps=True)
 
     return
 
@@ -95,7 +96,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    print(args)
+    log.info(args)
 
     build_dataset(
         sector=args.sector,

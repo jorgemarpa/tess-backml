@@ -232,6 +232,10 @@ def animate_cube(
 
     # Plot first image in cube.
     nt = 0
+    if cadenceno is not None and time is not None:
+        title = f"CAD {cadenceno[nt]} | BTJD {time[nt]:.4f}"
+    else:
+        title = f"Time index {nt}"
     ax = plot_img(
         cube[nt],
         scol_2d=scol_2d,
@@ -240,13 +244,17 @@ def animate_cube(
         extent=extent,
         cbar=True,
         ax=ax,
-        title=f"CAD {cadenceno[nt]} | BTJD {time[nt]:.4f}",
+        title=title,
         cnorm=norm,
         bar_label=bar_label,
     )
 
     # Define function for animation
     def animate(nt):
+        if cadenceno is not None and time is not None:
+            title = f"CAD {cadenceno[nt]} | BTJD {time[nt]:.4f}"
+        else:
+            title = f"Time index {nt}"
         ax.clear()
         _ = plot_img(
             cube[nt],
@@ -256,7 +264,7 @@ def animate_cube(
             extent=extent,
             cbar=False,
             ax=ax,
-            title=f"CAD {cadenceno[nt]} | BTJD {time[nt]:.4f}",
+            title=title,
             cnorm=norm,
             bar_label=bar_label,
         )
@@ -278,3 +286,69 @@ def animate_cube(
     )
 
     return ani
+
+def int_to_binary_array(integer: int, num_bits: int) -> np.ndarray:
+    """
+    Converts a non-negative integer to its binary representation as a NumPy array.
+
+    Parameters
+    ----------
+    integer : int
+        The non-negative integer to convert.
+    num_bits : int
+        The desired number of bits in the output binary representation.
+        The binary string will be left-padded with zeros if necessary.
+        Must be greater than zero.
+
+    Returns
+    -------
+    np.ndarray
+        A NumPy array of dtype uint8 representing the binary digits (0 or 1),
+        with the most significant bit first. The length of the array is `num_bits`.
+    """
+    if not isinstance(integer, int):
+        raise TypeError("Input must be an integer.")
+    if integer < 0:
+        raise ValueError("Input must be a non-negative integer.")
+    if num_bits <= 0:
+        raise ValueError("Number of bits must be greater than zero.")
+
+    binary_string = bin(integer)[2:].zfill(num_bits)
+
+    raw_binary_string = bin(integer)[2:]
+    if len(raw_binary_string) > num_bits:
+         print(f"Warning: Integer {integer} requires {len(raw_binary_string)} bits, "
+               f"but only {num_bits} requested. Result might be misleading "
+               f"if relying on implicit truncation by downstream slicing.")
+    binary_string = raw_binary_string.zfill(num_bits)
+
+
+    binary_array = np.array([int(bit) for bit in binary_string], dtype=np.uint8)
+    return binary_array
+
+def has_bit(quality_array: np.ndarray, bit: int) -> np.ndarray:
+    """
+    Checks if a specific bit is set in each element of a quality flag array.
+
+    Parameters
+    ----------
+    quality_array : np.ndarray
+        A NumPy array of integers (quality flags).
+    bit : int
+        The bit position to check (1-based index, where 1 is the LSB).
+        Must be between 1 and 16 (inclusive).
+
+    Returns
+    -------
+    np.ndarray
+        A boolean NumPy array of the same shape as `quality_array`, where
+        True indicates that the specified `bit` is set (1) in the
+        corresponding quality flag integer.
+    """
+    if not isinstance(bit, int):
+         raise TypeError("`bit` must be an integer.")
+    if not 1 <= bit <= 16:
+        raise ValueError("`bit` must be between 1 and 16 (inclusive).")
+
+    mask = np.array([int_to_binary_array(int(x), 16)[-bit] for x in quality_array], dtype=bool)
+    return mask

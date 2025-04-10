@@ -1,3 +1,4 @@
+import os
 import pickle
 from typing import Optional, Tuple
 
@@ -12,8 +13,8 @@ from scipy import ndimage
 from tesscube import TESSCube
 from tqdm import tqdm
 
-from . import PACKAGEDIR
-from .utils import animate_cube, pooling_2d, fill_nans_interp
+from . import PACKAGEDIR, log
+from .utils import animate_cube, pooling_2d, fill_nans_interp, has_bit
 
 camccd_orient = {
     "cam1": {
@@ -124,9 +125,25 @@ class BackgroundCube(object):
         self.nt = len(self.time)
         self.ffi_size = 2048
 
+        self._make_quality_mask()
+
     def __repr__(self):
         """Return a string representation of the BackgroundCube object."""
         return f"TESS FFI Background object (Sector, Camera, CCD, N times): {self.sector}, {self.camera}, {self.ccd}, {self.nt}"
+
+    def _make_quality_mask(self, bits: list=[3]):
+        """
+        Idetify specific bits in the quality mask and remove the cadences from the cubes
+
+        Parameters
+        ----------
+        bits: list
+            List of bits to be removed
+        """
+        mask = np.zeros(self.nt).astype(bool)
+        for bit in bits:
+            mask |= has_bit(self.tcube.quality, bit=bit)
+        self.quality = mask
 
     def _get_dark_frame_idx(self, low_per: float = 3.0):
         """
@@ -145,29 +162,28 @@ class BackgroundCube(object):
         """
         # check if dark frames are in file
         darkframe_file = f"{PACKAGEDIR}/data/dark_frame_indices_tess_ffi.pkl"
-        with open(darkframe_file, "rb") as f:
-            frames = pickle.load(f)
-            if self.sector in frames.keys():
-                if f"{self.camera}-{self.ccd}" in frames[self.sector].keys():
-                    self.dark_frames = frames[self.sector][f"{self.camera}-{self.ccd}"]
-                    self.darkest_frame = self.dark_frames[0]
-                    return
-            else:
-                frames[self.sector] = {}
+        if os.path.isfile(darkframe_file):
+            with open(darkframe_file, "rb") as f:
+                frames = pickle.load(f)
+                if self.sector in frames.keys():
+                    if f"{self.camera}-{self.ccd}" in frames[self.sector].keys():
+                        self.dark_frames = frames[self.sector][f"{self.camera}-{self.ccd}"]
+                        self.darkest_frame = self.dark_frames[0]
+                        return
+                else:
+                    frames[self.sector] = {}
+        else:
+            frames = {}
+            frames[self.sector] = {}
 
         # if not pre computed, we have to find darkest frames by downloading some
         # FFI pixels and making a median LC
+        step = 16
         srow = np.arange(
-            self.rmin + self.img_bin / 2,
-            self.rmax - self.img_bin / 2,
-            self.img_bin,
-            dtype=int,
+            self.rmin + step / 2, self.rmax - step / 2, step, dtype=int,
         )
         scol = np.arange(
-            self.cmin + self.img_bin / 2,
-            self.cmax - self.img_bin / 2,
-            self.img_bin,
-            dtype=int,
+            self.cmin + step / 2, self.cmax - step / 2, step, dtype=int,
         )
         srow_2d, scol_2d = np.meshgrid(srow, scol, indexing="ij")
         sparse_rc = [(r, c) for r, c in zip(srow_2d.ravel(), scol_2d.ravel())][::2]
@@ -179,7 +195,11 @@ class BackgroundCube(object):
         self.bkg_lc = np.nanmedian(pix_ts, axis=-1)
         # find darkes and < 3% frame indices
         dark_frames = np.where(self.bkg_lc <= np.percentile(self.bkg_lc, low_per))[0]
+        # we remove bad frames from the list
+        dark_frames = dark_frames[np.isin(dark_frames, np.where(self.quality)[0], invert=True)]
+        # take the top 10 frames
         self.dark_frames = dark_frames[np.argsort(self.bkg_lc[dark_frames])][:10]
+        # take the darkest
         self.darkest_frame = self.dark_frames[0]
 
         # we update the local file to cache the results
@@ -235,7 +255,8 @@ class BackgroundCube(object):
         self.strap_mask = np.zeros((2048, 2048)).astype(bool)
         # the indices in the file are 1-based in the science portion of the ccd
         self.strap_mask[:, straps["Column"].values - 1] = True
-        self.strap_mask = ndimage.binary_dilation(self.strap_mask, iterations=dilat_iter)
+        if dilat_iter > 0:
+            self.strap_mask = ndimage.binary_dilation(self.strap_mask, iterations=dilat_iter)
 
         return
 
@@ -256,21 +277,23 @@ class BackgroundCube(object):
         vmin, vmax = np.percentile(self.ffi_dark.ravel(), [3, 97])
 
         if mask_straps:
-            fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+            fig, ax = plt.subplots(1, 3, figsize=(12, 4), sharey=True)
         else:
-            fig, ax = plt.subplots(1, 2, figsize=(9, 4))
+            fig, ax = plt.subplots(1, 2, figsize=(9, 4), sharey=True)
         ax[0].set_title("Darkest frame FFI")
         bar = ax[0].imshow(self.ffi_dark, origin="lower", vmin=vmin, vmax=vmax)
         plt.colorbar(bar, ax=ax[0], shrink=0.8, label="Flux [-e/s]")
 
         ax[1].set_title(r"Star mask 5$\sigma$")
         bar = ax[1].imshow(self.star_mask, origin="lower", vmin=0, vmax=1)
-        plt.colorbar(bar, ax=ax[1], shrink=0.8)
+        plt.colorbar(bar, ax=ax[1:], shrink=0.8)
+        ax[1].set_yticks([])
 
         if mask_straps:
             ax[2].set_title("Strap Mask")
             bar = ax[2].imshow(self.strap_mask, origin="lower", vmin=0, vmax=1)
-            plt.colorbar(bar, ax=ax[2], shrink=0.8)
+            ax[2].set_yticks([])
+            # plt.colorbar(bar, ax=ax[2], shrink=0.8)
         plt.show()
         return
 
@@ -312,15 +335,16 @@ class BackgroundCube(object):
             If None, processes all frames. Default is None.
         """
         # get dark frame
-        print("Computing sector darkest frames...")
+        log.info("Computing sector darkest frames...")
         self._get_dark_frame_idx()
         # get star mask
-        print("Computing star mask...")
+        log.info("Computing star mask...")
         self._get_star_mask(sigma=5.0, dilat_iter=2)
         self.bkg_pixels = ~self.star_mask
         # mask out straps
         if mask_straps:
-            self._get_straps_mask()
+            dilat_iter = 2 if self.img_bin >= 12 else 1
+            self._get_straps_mask(dilat_iter=dilat_iter)
             self.bkg_pixels &= ~self.strap_mask
         if plot:
             self.plot_dark_frame(mask_straps=mask_straps)
@@ -339,7 +363,7 @@ class BackgroundCube(object):
         )
 
         self.row_2d, self.col_2d = np.meshgrid(srow, scol, indexing="ij")
-        print("Getting FFI flux cube...")
+        log.info("Getting FFI flux cube...")
         # get flux cube with downsampling
         if self.downsize == "sparse":
             # sparse pixels across the CCD
@@ -348,12 +372,16 @@ class BackgroundCube(object):
             ]
             flux_cube = self.tcube.get_pixel_timeseries(sparse_rc, return_errors=False)
             flux_cube = flux_cube.reshape((self.tcube.nframes, *self.row_2d.shape))
+            flux_cube = flux_cube[~self.quality]
 
         elif self.downsize == "binning":
             # all pixels the binning with seld.
             flux_cube = []
-            self.static = self._get_static_scene()
+            # make a static scene from median of darkes frames
+            if not hasattr(self, "static"):
+                self.static = self._get_static_scene()
             mask_pixels = ~self.bkg_pixels
+            # create time index array to iterate when asked for specific frames
             if isinstance(frames, tuple):
                 if len(frames) == 1:
                     fi, ff, step = 0, frames, 1
@@ -365,6 +393,9 @@ class BackgroundCube(object):
             else:
                 frange = range(0, self.nt)
             for f in tqdm(frange, desc="Iterating frames"):
+                # skip bad cadences
+                if self.quality[f]:
+                    continue
                 current = self.tcube.get_ffi(f)[1].data[
                     self.rmin : self.rmax, self.cmin : self.cmax
                 ]
@@ -379,16 +410,18 @@ class BackgroundCube(object):
 
                 flux_cube.append(current)
             flux_cube = np.array(flux_cube)
-            if len(flux_cube) != self.nt:
-                aux = np.zeros((self.nt, flux_cube.shape[1], flux_cube.shape[2]))
+            if len(flux_cube) != self.nt - self.quality.sum():
+                aux = np.zeros((
+                    self.nt - self.quality.sum(), flux_cube.shape[1], flux_cube.shape[2]
+                ))
                 aux[fi:ff:step] = flux_cube
                 flux_cube = aux
 
         else:
-            print("Wrong pixel grid option...")
+            log.info("Wrong pixel grid option...")
 
         if np.isnan(flux_cube).any():
-            print("Filling nans with interpolation...")
+            log.info("Filling nans with interpolation...")
             flux_cube = fill_nans_interp(flux_cube)
 
         self.scatter_cube = flux_cube
@@ -412,7 +445,7 @@ class BackgroundCube(object):
         rmin, rmax, cmin, cmax : int
             Indices defining the active CCD area.
         """
-        print("Computing average static scene from darkes frames...")
+        log.info("Computing average static scene from darkes frames...")
         static = np.median([self.tcube.get_ffi(f)[1].data[
                 self.rmin : self.rmax, self.cmin : self.cmax
             ] for f in self.dark_frames], axis=0)
@@ -489,6 +522,8 @@ class BackgroundCube(object):
         # the new Alt/Az/Dist values are calculated following trigonoetric rules using
         # # the original values w.r.t the camera's boresight.
         for t in tqdm(range(len(self.vectors)), total=len(self.vectors)):
+            if self.quality[t]:
+                continue
             dist = self.vectors[f"{object}_Distance"][t] * const.R_earth
             aux_elev = np.sin(
                 np.deg2rad(self.vectors[f"{object}_Camera_Angle"][t] - 90)
@@ -524,6 +559,11 @@ class BackgroundCube(object):
         object_alt_map = np.array(object_alt_map)
         object_az_map = np.array(object_az_map)
         object_dist_map = np.array(object_dist_map)
+
+        if object_alt_map.shape != self.scatter_cube.shape:
+            raise ValueError(
+                f"The resulting maps have different shape as the scatter cube {object_alt_map.shape}!= {self.scatter_cube.shape}"
+            )
 
         # we need to flip the value maps to account for cam/CCD orientations
         if self.camera in [1, 2]:
@@ -676,7 +716,7 @@ class BackgroundCube(object):
         """
         if out_file is None:
             out_file = f"./ffi_cubes_bin{self.img_bin}_sector{self.sector:03}_{self.camera}-{self.ccd}.npz"
-            print(f"Saving to {out_file}")
+            log.info(f"Saving to {out_file}")
             if save_maps:
                 out_file = out_file.replace("cubes", "sl")
 

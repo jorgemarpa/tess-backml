@@ -15,7 +15,6 @@ def get_logger():
     """
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
-    logger.addHandler(logging.StreamHandler())
     return logger
 
 log = get_logger()
