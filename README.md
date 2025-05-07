@@ -26,7 +26,7 @@ Install from this GitHub repository with
 pip install git+https://github.com/jorgemarpa/tess-backml
 ```
 
-PyPI will available shortly.
+PyPI will be available soon.
 
 ## Usage
 
@@ -50,7 +50,7 @@ tess_bkg.get_vector_maps(ang_size=True)
 tess_bkg.animate_data(data="sl", save=False, step=10);
 
 # save data to disk
-tess_bkg.save_data(save_maps=True)
+tess_bkg.save_data_npz(save_maps=True)
 ```
 
 Or you can run a Python script `build_dataset.py` in the terminal (plotting flag is optional and will add
