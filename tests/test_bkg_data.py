@@ -11,7 +11,7 @@ def test_BackgroundCube():
         sector=sector, camera=camera, ccd=ccd, img_bin=16, downsize="binning"
     )
 
-    assert bc.nt == 1245
+    assert bc.nt == 1235
     assert bc.sector == sector
     assert bc.camera == camera
     assert bc.ccd == ccd

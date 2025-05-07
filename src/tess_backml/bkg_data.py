@@ -1,5 +1,5 @@
-import os
 import datetime
+import os
 import pickle
 import warnings
 from typing import Optional, Tuple
@@ -10,13 +10,13 @@ import numpy as np
 import pandas as pd
 import tessvectors
 from astropy import constants as const
-from astropy.stats import sigma_clip
 from astropy.io import fits
+from astropy.stats import sigma_clip
 from scipy import ndimage
 from tesscube import TESSCube
 from tqdm import tqdm
 
-from . import PACKAGEDIR, log, __version__
+from . import PACKAGEDIR, __version__, log
 from .utils import animate_cube, fill_nans_interp, has_bit, pooling_2d
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
