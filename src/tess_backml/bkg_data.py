@@ -78,8 +78,6 @@ class BackgroundCube(object):
     img_bin : int, optional
         Binning factor for spatial downsampling of the FFI image.
         Must be a divisor of 2048. Default is 16. #
-    time_bin : int, optional
-        Binning factor for the time axis. Default is 1 (no binning).
     downsize : str, optional
         Method for spatial downsampling. Options are 'binning' (median binning)
         or 'sparse' (select sparse pixels). Default is "binning".
@@ -91,7 +89,6 @@ class BackgroundCube(object):
         camera: int = 1,
         ccd: int = 1,
         img_bin: int = 16,
-        time_bin: int = 1,
         downsize: str = "binning",
     ):
         """
@@ -117,7 +114,7 @@ class BackgroundCube(object):
         self.camera = camera
         self.ccd = ccd
         self.img_bin = img_bin
-        self.time_bin = time_bin
+        self.time_binned = False
         self.downsize = downsize
         self.tess_pscale = 0.21 * u.arcsec / u.pixel
         self.tess_psize = 15 * u.micrometer
@@ -125,10 +122,14 @@ class BackgroundCube(object):
         self.tcube = TESSCube(sector=sector, camera=camera, ccd=ccd)
         self.time = self.tcube.time + self.btjd0
         self.cadenceno = self.tcube.cadence_number
-        self.nt = len(self.time)
         self.ffi_size = 2048
 
         self._make_quality_mask()
+        # apply quality mask to remove bad frames
+        self.time = self.time[~self.quality]
+        self.cadenceno = self.cadenceno[~self.quality]
+        self.nt = len(self.time)
+        # NOTE: self.tcube will have the original number of total frames for future ref
 
     def __repr__(self):
         """Return a string representation of the BackgroundCube object."""
@@ -143,7 +144,7 @@ class BackgroundCube(object):
         bits: list
             List of bits to be removed
         """
-        mask = np.zeros(self.nt).astype(bool)
+        mask = np.zeros(self.tcube.nframes).astype(bool)
         for bit in bits:
             mask |= has_bit(self.tcube.quality, bit=bit)
         self.quality = mask
@@ -305,6 +306,7 @@ class BackgroundCube(object):
         plot: bool = False, 
         mask_straps: bool = False, 
         frames: Optional[Tuple] = None,
+        rolling: bool = True,
     ):
         """
         Computes the scattered light cube by processing FFIs.
@@ -336,6 +338,10 @@ class BackgroundCube(object):
             - (start, stop): Process frames from index `start` up to `stop`.
             - (start, stop, step): Process frames from `start` to `stop` with `step`.
             If None, processes all frames. Default is None.
+        rolling: bool, optional
+            If True, pooling downsizing will be done with an iterative rolling windown and stride 
+            that will match the output desired shape, this will make the downsizing step slower.
+            If False, pooling downsizing will use fixed window and stride.
         """
         # get dark frame
         log.info("Computing sector darkest frames...")
@@ -376,6 +382,7 @@ class BackgroundCube(object):
             flux_cube = self.tcube.get_pixel_timeseries(sparse_rc, return_errors=False)
             flux_cube = flux_cube.reshape((self.tcube.nframes, *self.row_2d.shape))
             flux_cube = flux_cube[~self.quality]
+            pixel_counts = np.ones(flux_cube.shape[1:], dtype=int)
 
         elif self.downsize == "binning":
             # all pixels the binning with seld.
@@ -394,7 +401,7 @@ class BackgroundCube(object):
                     fi, ff, step = frames[0], frames[1], frames[2]
                 frange = range(fi, ff, step)
             else:
-                frange = range(0, self.nt)
+                frange = range(0, self.tcube.nframes)
             for f in tqdm(frange, desc="Iterating frames"):
                 # skip bad cadences
                 if self.quality[f]:
@@ -404,21 +411,43 @@ class BackgroundCube(object):
                 ]
                 current[mask_pixels] = np.nan
                 current -= self.static
-                current = pooling_2d(
-                        current,
-                        kernel_size=self.img_bin,
-                        stride=self.img_bin,
-                        stat=np.nanmedian,
-                    )
+                if rolling:
+                    times = int(np.log2(self.img_bin))
+                    for k in range(times):
+                        current = pooling_2d(
+                            current,
+                            kernel_size=4,
+                            stride=2,
+                            stat=np.nanmedian,
+                            padding=1,
+                        )
+                else:
+                    current = pooling_2d(
+                            current,
+                            kernel_size=self.img_bin,
+                            stride=self.img_bin,
+                            stat=np.nanmedian,
+                        )
+                
+                
 
                 flux_cube.append(current)
             flux_cube = np.array(flux_cube)
-            if len(flux_cube) != self.nt - self.quality.sum():
+            if len(flux_cube) != self.nt:
                 aux = np.zeros((
-                    self.nt - self.quality.sum(), flux_cube.shape[1], flux_cube.shape[2]
+                    self.nt, flux_cube.shape[1], flux_cube.shape[2]
                 ))
                 aux[fi:ff:step] = flux_cube
                 flux_cube = aux
+            # count the number of valid pixels in each bin
+            pixel_counts = np.ones((self.rmax - self.rmin, self.cmax - self.cmin))
+            pixel_counts[mask_pixels] = np.nan
+            pixel_counts = pooling_2d(
+                pixel_counts,
+                kernel_size=self.img_bin,
+                stride=self.img_bin,
+                stat=np.nansum,
+            ).astype(int)
 
         else:
             log.info("Wrong pixel grid option...")
@@ -428,6 +457,7 @@ class BackgroundCube(object):
             flux_cube = fill_nans_interp(flux_cube)
 
         self.scatter_cube = flux_cube
+        self.pixel_counts = pixel_counts
         
         return
 
@@ -661,7 +691,7 @@ class BackgroundCube(object):
 
         return
 
-    def bin_time_axis(self):
+    def bin_time_axis(self, bin_size: float = 2.5):
         """
         Performs temporal binning on the calculated data cubes and vectors.
 
@@ -672,19 +702,43 @@ class BackgroundCube(object):
         Modifies Attributes In-Place
         ---------------------------
         scatter_cube, time, cadenceno, earth_maps, earth_vectors, moon_maps, moon_vectors
+
+        Parameters
+        ----------
+        bin_size : float, optional
+            Bin size for time axis in units of hours (e.g. 2.5 hours).
         """
-        # bin in time if asked
-        if self.time_bin > 1:
-            indices = np.array_split(np.arange(self.nt), int(self.nt / self.time_bin))
-
-            self.scatter_cube = np.array(
-                [np.nanmedian(self.scatter_cube[x], axis=0) for x in indices]
+        diff = np.diff(self.time)
+        if bin_size <= np.median(diff):
+            raise ValueError(
+                f"Bin size must be larger than the median elapsed time between observations {np.median(diff)*24:.2f} H."
             )
-            self.time = np.array([np.mean(self.times[x], axis=0) for x in indices])
-            self.cadenceno = np.array(
-                [np.mean(self.cadenceno[x], axis=0) for x in indices]
-            )
+        
+        # first find data gaps due to downlink
+        gaps = np.where(diff > 3 * np.median(diff))[0] + 1
+        # avoid bad frames
+        bad_frames = np.where(self.quality)[0]
 
+        # compute indices in each bin for time aggregation 
+        indices = []
+        # we do binning per orbits to account for data discontinuity
+        for no, orb in enumerate(np.array_split(np.arange(len(self.time)), gaps)):
+            # bin eges in time units
+            time_binedges = np.arange(self.time[orb].min(), self.time[orb].max(), bin_size/24.)
+            # find indices within time bin
+            for s,f in zip(time_binedges[:-1], time_binedges[1:]):
+                idx = np.where((self.time >= s) & (self.time < f))[0]
+                idx = idx[np.isin(idx, bad_frames, invert=True)]
+                indices.append(idx)
+            # add remaining indices at the end of orbit
+            indices.append(np.arange(indices[-1][-1] + 1, orb[-1] + 1))
+
+        # agregate cubes/arrays in the time axis
+        self.scatter_cube_bin = np.array([np.mean(self.scatter_cube[x], axis=0) for x in indices])
+        self.time_bin = np.array([np.mean(self.time[x], axis=0) for x in indices])
+        self.cadenceno_bin = np.array([np.mean(self.cadenceno[x], axis=0) for x in indices])
+
+        if hasattr(self, "earth_maps") and hasattr(self, "earth_vectors"):
             for key in ["dist", "alt", "az"]:
                 self.earth_vectors[key] = np.array(
                     [np.mean(self.earth_vectors[key][x], axis=0) for x in indices]
@@ -698,10 +752,12 @@ class BackgroundCube(object):
                 self.moon_maps[key] = np.array(
                     [np.mean(self.moon_maps[key][x], axis=0) for x in indices]
                 )
+        self.time_binned = True
 
         return
+        
 
-    def save_data(self, out_file: Optional[str] = None, save_maps: bool = False):
+    def save_data_npz(self, out_file: Optional[str] = None, save_maps: bool = False):
         """
         Saves the processed background data to a NumPy .npz file.
 
@@ -727,8 +783,8 @@ class BackgroundCube(object):
             np.savez(
                 out_file,
                 scatter_cube=self.scatter_cube,
-                time=self.time[~self.quality],
-                cadenceno=self.cadenceno[~self.quality],
+                time=self.time,
+                cadenceno=self.cadenceno,
                 earth_alt=self.earth_vectors["alt"][~self.quality],
                 earth_az=self.earth_vectors["az"][~self.quality],
                 earth_dist=self.earth_vectors["dist"][~self.quality],
