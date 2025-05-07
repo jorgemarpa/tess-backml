@@ -458,15 +458,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#src.tess_backml.BackgroundCube.time_bin" class="md-nav__link">
-    <span class="md-ellipsis">
-      time_bin
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#src.tess_backml.BackgroundCube.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
@@ -497,15 +488,6 @@
   <a href="#src.tess_backml.BackgroundCube.get_vector_maps" class="md-nav__link">
     <span class="md-ellipsis">
       get_vector_maps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#src.tess_backml.BackgroundCube.save_data" class="md-nav__link">
-    <span class="md-ellipsis">
-      save_data
     </span>
   </a>
   
@@ -672,15 +654,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#src.tess_backml.BackgroundCube.time_bin" class="md-nav__link">
-    <span class="md-ellipsis">
-      time_bin
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#src.tess_backml.BackgroundCube.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
@@ -711,15 +684,6 @@
   <a href="#src.tess_backml.BackgroundCube.get_vector_maps" class="md-nav__link">
     <span class="md-ellipsis">
       get_vector_maps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#src.tess_backml.BackgroundCube.save_data" class="md-nav__link">
-    <span class="md-ellipsis">
-      save_data
     </span>
   </a>
   
@@ -831,16 +795,6 @@ Must be a divisor of 2048. Default is 16. #</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>time_bin</code></b>
-              (<code><span title="int">int</span></code>, default:
-                  <code>1</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Binning factor for the time axis. Default is 1 (no binning).</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
             <b><code>downsize</code></b>
               (<code><span title="str">str</span></code>, default:
                   <code>&#39;binning&#39;</code>
@@ -870,28 +824,6 @@ or 'sparse' (select sparse pixels). Default is "binning".</p>
 
 
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="src.tess_backml.BackgroundCube.time_bin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">time_bin</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">time_bin</span> <span class="o">=</span> <span class="n"><span title="src.tess_backml.bkg_data.BackgroundCube(time_bin)">time_bin</span></span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-    </div>
-
-</div>
-
 
 
 <div class="doc doc-object doc-function">
@@ -907,9 +839,8 @@ or 'sparse' (select sparse pixels). Default is "binning".</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">camera</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">ccd</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">img_bin</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">time_bin</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">downsize</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;binning&quot;</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">downsize</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;binning&quot;</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -970,7 +901,8 @@ Default is False.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plot</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">mask_straps</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">frames</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="typing.Tuple">Tuple</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">rolling</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1028,6 +960,18 @@ to stars. Default is False.</p>
 If None, processes all frames. Default is None.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+            <b><code>rolling</code></b>
+              (<code><span title="bool">bool</span></code>, default:
+                  <code>True</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>If True, pooling downsizing will be done with an iterative rolling windown and stride 
+that will match the output desired shape, this will make the downsizing step slower.
+If False, pooling downsizing will use fixed window and stride.</p>
+          </div>
+        </li>
     </ul>
 
 
@@ -1068,58 +1012,6 @@ Also stores the boresight vectors for reference.</p>
             <p>If True, the 'dist' maps and vectors represent angular size (degrees).
 If False, they represent physical distance ([m] for maps).
 Default is True.</p>
-          </div>
-        </li>
-    </ul>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="src.tess_backml.BackgroundCube.save_data" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">save_data</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">save_data</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">out_file</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_maps</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Saves the processed background data to a NumPy .npz file.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>out_file</code></b>
-              (<code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>, default:
-                  <code>None</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>Path to the output .npz file. If None, a default filename is
-generated based on sector, camera, ccd, and binning factor, saved
-in the current directory. Default is None.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>save_maps</code></b>
-              (<code><span title="bool">bool</span></code>, default:
-                  <code>False</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>If True, saves the detailed pixel-wise maps for Earth and Moon
-angles/distances alongside the scatter cube and boresight vectors.
-If False, saves only the scatter cube, time, cadence, and boresight
-vectors (smaller file size). Default is False.</p>
           </div>
         </li>
     </ul>
