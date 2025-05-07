@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,22 +11,31 @@ def pooling_2d(
     input_array: np.ndarray,
     kernel_size: int = 4,
     stride: int = 4,
+    padding: Union[int, Tuple[int, int]] = 0,
     stat: Callable = np.nanmedian,
 ) -> np.ndarray:
     """
-    Performs 2D pooling on the input array.
+    Performs 2D pooling on the input array with optional zero padding.
 
     Parameters
     ----------
     input_array : np.ndarray
         A 2D numpy array representing the input data.
     kernel_size : int, optional
-        The size of the pooling kernel (square), by default 4.
+        The size of the pooling kernel (square), by default 4. Must be positive.
     stride : int, optional
-        The stride of the pooling operation, by default 4.
+        The stride of the pooling operation, by default 4. Must be positive.
+    padding : Union[int, Tuple[int, int]], optional
+        Padding to be added to the input array before pooling.
+        - If an int `p`: applies symmetric padding of `p` zeros.
+          `p` rows of zeros are added to the top and `p` to the bottom.
+          `p` columns of zeros are added to the left and `p` to the right.
+        - If a tuple `(p_h, p_w)`: applies `p_h` rows of zeros to the top and `p_h` to the bottom,
+          and `p_w` columns of zeros to the left and `p_w` to the right.
+        Padding values must be non-negative. Default is 0 (no padding).
     stat : Callable, optional
-        The aggregation function to use for pooling (e.g., np.mean, np.max), 
-        by default np.mean.
+        The aggregation function to use for pooling (e.g., np.mean, np.max, np.nanmedian),
+        by default np.nanmedian.
 
     Returns
     -------
@@ -36,22 +45,90 @@ def pooling_2d(
     if input_array.ndim != 2:
         raise ValueError("Input array must be 2D.")
 
-    input_height, input_width = input_array.shape
+    if kernel_size <= 0:
+        raise ValueError("Kernel size must be positive.")
+    if stride <= 0:
+        raise ValueError("Stride must be positive.")
+
+    # Determine padding amounts for top/bottom and left/right
+    pad_h_amount: int
+    pad_w_amount: int
+
+    if isinstance(padding, int):
+        if padding < 0:
+            raise ValueError("Padding value cannot be negative.")
+        pad_h_amount = padding
+        pad_w_amount = padding
+    elif isinstance(padding, tuple):
+        if len(padding) != 2:
+            raise ValueError("Padding tuple must have two elements (pad_h, pad_w).")
+        if not (isinstance(padding[0], int) and isinstance(padding[1], int)):
+            raise ValueError("Padding tuple elements must be integers.")
+        if padding[0] < 0 or padding[1] < 0:
+            raise ValueError("Padding values in tuple cannot be negative.")
+        pad_h_amount = padding[0]
+        pad_w_amount = padding[1]
+    else:
+        raise ValueError("Padding must be an int or a tuple of two non-negative ints.")
+
+    # Apply padding if necessary
+    if pad_h_amount > 0 or pad_w_amount > 0:
+        # np.pad expects ((pad_top, pad_bottom), (pad_left, pad_right))
+        # Here, pad_h_amount is for top AND bottom, pad_w_amount for left AND right.
+        padded_array = np.pad(input_array,
+                              ((pad_h_amount, pad_h_amount), (pad_w_amount, pad_w_amount)),
+                              mode='constant',
+                              constant_values=np.nan)
+    else:
+        padded_array = input_array # No padding needed or padding values were zero
+
+    current_input_height, current_input_width = padded_array.shape
+
+    # Calculate output dimensions
+    # The formula for output dimension is O = floor((I - K) / S) + 1
+    # where I is the input dimension *after* padding.
+    # We use max(0, ...) to ensure dimensions are not negative, as negative
+    # dimensions are invalid for array shapes.
+    output_height_raw = (current_input_height - kernel_size) // stride + 1
+    output_width_raw = (current_input_width - kernel_size) // stride + 1
+
+    output_height = max(0, output_height_raw)
+    output_width = max(0, output_width_raw)
     
-    output_height = (input_height - kernel_size) // stride + 1
-    output_width = (input_width - kernel_size) // stride + 1
-    
+    # If output_height or output_width is 0, shape_view will have a 0 dimension.
+    # np.lib.stride_tricks.as_strided will create a view with this 0 dimension.
+    # Subsequent application of `stat` (e.g., np.nanmedian) on such a view
+    # typically results in an empty array with the correct remaining dimensions,
+    # (e.g., shape (0, N) or (N, 0) or (0,0)), which is the desired behavior.
+
     shape_view = (output_height, output_width, kernel_size, kernel_size)
-    strides_view = (input_array.strides[0] * stride, input_array.strides[1] * stride, input_array.strides[0], 
-                    input_array.strides[1])
-    
-    window_view = np.lib.stride_tricks.as_strided(input_array, shape=shape_view, strides=strides_view)
-    
+    strides_view = (padded_array.strides[0] * stride,
+                    padded_array.strides[1] * stride,
+                    padded_array.strides[0],
+                    padded_array.strides[1])
+
+    window_view = np.lib.stride_tricks.as_strided(padded_array, shape=shape_view, strides=strides_view)
+
     output_array = stat(window_view, axis=(2, 3))
+
     return output_array
 
-def fill_nans_interp(cube, deg=3):
-    print("Linear modeling method")
+def fill_nans_interp(cube: np.ndarray, deg:int = 3) -> np.ndarray:
+    """
+    Replace nan values in a data cube using plynomial interpolation
+
+    Parameters
+    ----------
+    cube: np.ndarray
+        Data cube with nan values to be interpolated
+    deg: int, optional
+        Degree of polynomial, defualt is 3.
+
+    Returns
+    -------
+    np.ndarray
+        Interpolated data cube without nan values
+    """
     x, y = np.arange(cube.shape[2], dtype=float), np.arange(cube.shape[1], dtype=float)
     x = (x - np.median(x)) / np.std(x)
     y = (y - np.median(y)) / np.std(y)
@@ -63,10 +140,7 @@ def fill_nans_interp(cube, deg=3):
             for jdx in range(deg + 1)
         ]
     ).T
-    print(DM.shape)
-    print(cube.shape)
     mask = ~np.isnan(cube[0]).ravel()
-    print((~mask).sum())
 
     filled = []
     for idx in tqdm(range(len(cube))):
