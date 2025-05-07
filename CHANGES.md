@@ -1,4 +1,4 @@
-# 0.2.0 (unreleased)
+# 0.2.0 (2025-05-07)
 - Collect and propagate errors
 - No inplace operations when time binning
 - Improved time binning with bin size in units of time (hours) and avoiding bad frames
