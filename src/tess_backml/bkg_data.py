@@ -701,10 +701,6 @@ class BackgroundCube(object):
         of `scatter_cube`, `time`, `cadenceno`, and all Earth/Moon vector maps
         and boresight vectors by taking the mean or median within each time bin.
 
-        Modifies Attributes In-Place
-        ---------------------------
-        scatter_cube, time, cadenceno, earth_maps, earth_vectors, moon_maps, moon_vectors
-
         Parameters
         ----------
         bin_size : float, optional
@@ -741,17 +737,21 @@ class BackgroundCube(object):
         self.cadenceno_bin = np.array([np.mean(self.cadenceno[x], axis=0) for x in indices])
 
         if hasattr(self, "earth_maps") and hasattr(self, "earth_vectors"):
+            self.earth_vectors_bin = {}
+            self.earth_maps_bin = {}
+            self.moon_vectors_bin = {}
+            self.moon_maps_bin = {}
             for key in ["dist", "alt", "az"]:
-                self.earth_vectors[key] = np.array(
+                self.earth_vectors_bin[key] = np.array(
                     [np.mean(self.earth_vectors[key][x], axis=0) for x in indices]
                 )
-                self.earth_maps[key] = np.array(
+                self.earth_maps_bin[key] = np.array(
                     [np.mean(self.earth_maps[key][x], axis=0) for x in indices]
                 )
-                self.moon_vectors[key] = np.array(
+                self.moon_vectors_bin[key] = np.array(
                     [np.mean(self.moon_vectors[key][x], axis=0) for x in indices]
                 )
-                self.moon_maps[key] = np.array(
+                self.moon_maps_bin[key] = np.array(
                     [np.mean(self.moon_maps[key][x], axis=0) for x in indices]
                 )
         self.time_binned = True
