@@ -1,4 +1,5 @@
 # 0.2.0 (unreleased)
+- Collect and propagate errors
 - No inplace operations when time binning
 - Improved time binning with bin size in units of time (hours) and avoiding bad frames
 - Save scatter light cube to FITS file, option of binned or all-frames
