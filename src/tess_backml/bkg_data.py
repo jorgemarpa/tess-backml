@@ -1,4 +1,5 @@
 import os
+import datetime
 import pickle
 import warnings
 from typing import Optional, Tuple
@@ -10,11 +11,12 @@ import pandas as pd
 import tessvectors
 from astropy import constants as const
 from astropy.stats import sigma_clip
+from astropy.io import fits
 from scipy import ndimage
 from tesscube import TESSCube
 from tqdm import tqdm
 
-from . import PACKAGEDIR, log
+from . import PACKAGEDIR, log, __version__
 from .utils import animate_cube, fill_nans_interp, has_bit, pooling_2d
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -753,9 +755,70 @@ class BackgroundCube(object):
                     [np.mean(self.moon_maps[key][x], axis=0) for x in indices]
                 )
         self.time_binned = True
+        self.time_binsie = bin_size
 
         return
+
+    def save_to_fits(self, out_file: Optional[str] = None, binned: bool = True):
+        """
+        Saves the downsize version of the scatter light cube as a FITS file similar to
+        the MAST FFI cubes.
+
+        Parameters
+        ----------
+        out_file : Optional[str], optional
+            Path to the output .npz file. If None, a default filename is
+            generated based on sector, camera, ccd, and binning factor, saved
+            in the current directory. Default is None.
+
+        Returns
+        -------
+        hdul : HDUList object
+            Header unit list with data and metadata
+        """
+        if self.time_binned and binned:
+            cube_sets = np.array([self.scatter_cube_bin, np.sqrt(self.scatter_cube_bin)])
+            time_col = self.time_bin
+        else:
+            cube_sets = np.array([self.scatter_cube])#, np.sqrt(self.scatter_err_cube)])
+            time_col = self.time
+
+        priheader = self.tcube.primary_hdu.header.copy()
+        # del priheader["NAXIS1"], priheader["NAXIS2"], priheader["NAXIS3"], priheader["NAXIS4"]
         
+        prihdu = fits.PrimaryHDU(header=priheader)
+
+        prihdu.header["ORIGIN"] = ("NASA/GSFC", "Institution responsible for creating this file")
+        prihdu.header["DATE"] = (datetime.date.today().isoformat(), "file creation date")
+        prihdu.header["OBJECT"] = ("Scatter Light cube", "Type of data")
+        prihdu.header["CREATOR"] = ("tess-backml", "Software of origin")
+        prihdu.header["PROCVER"] = (__version__, "Software versin")
+        
+        prihdu.header["pixbin"] = (self.img_bin, "Bin size in pixel space")
+        prihdu.header["pixbinm"] = ("median", "Method of binning in pixel space")
+        prihdu.header["imgsizex"] = (cube_sets.shape[2], "Image size in axis X")
+        prihdu.header["imgsizey"] = (cube_sets.shape[3], "Image size in axis Y")
+        prihdu.header["timbins"] = (self.time_binsie, "[h] bin size in time axis")
+        prihdu.header["timbinm"] = ("mean", "Method of binning in time")
+        prihdu.header["timsize"] = (cube_sets.shape[1], "Cube size in time axis")
+        
+        imghdu = fits.ImageHDU(cube_sets.T, name="Scatter Light Cube")
+        pcthdu = fits.ImageHDU(self.pixel_counts, name="Pixel Counts")
+        
+        timhdu = fits.BinTableHDU.from_columns(
+            [
+                fits.Column(name="time", array=time_col, format="D", unit="jd"),
+            ]
+        )
+        timhdu.header["binned"] = (self.time_binned, "Is cube binned in time")
+        timhdu.header["EXTNAME"] = ("TIME")
+        
+        hdul = fits.HDUList([prihdu, imghdu, pcthdu, timhdu])
+        if out_file is None:
+            return hdul
+        else:
+            hdul.writeto(out_file, overwrite=True)
+            return
 
     def save_data_npz(self, out_file: Optional[str] = None, save_maps: bool = False):
         """
