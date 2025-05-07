@@ -675,15 +675,15 @@ class BackgroundCube(object):
 
         self.earth_maps = self._get_object_vectors(object="Earth", ang_size=ang_size)
         self.earth_vectors = {
-            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("m").value,
-            "alt": self.vectors["Earth_Camera_Angle"].values,
-            "az": self.vectors["Earth_Camera_Azimuth"].values,
+            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("m").value[~self.quality],
+            "alt": self.vectors["Earth_Camera_Angle"].values[~self.quality],
+            "az": self.vectors["Earth_Camera_Azimuth"].values[~self.quality],
         }
         self.moon_maps = self._get_object_vectors(object="Moon", ang_size=ang_size)
         self.moon_vectors = {
-            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("m").value,
-            "alt": self.vectors["Earth_Camera_Angle"].values,
-            "az": self.vectors["Earth_Camera_Azimuth"].values,
+            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("m").value[~self.quality],
+            "alt": self.vectors["Earth_Camera_Angle"].values[~self.quality],
+            "az": self.vectors["Earth_Camera_Azimuth"].values[~self.quality],
         }
         if ang_size:
             self.earth_vectors["dist"] = 2 * np.arctan(const.R_earth.to("m").value / (2 * self.earth_vectors["dist"]))
@@ -848,12 +848,12 @@ class BackgroundCube(object):
                 scatter_cube=self.scatter_cube,
                 time=self.time,
                 cadenceno=self.cadenceno,
-                earth_alt=self.earth_vectors["alt"][~self.quality],
-                earth_az=self.earth_vectors["az"][~self.quality],
-                earth_dist=self.earth_vectors["dist"][~self.quality],
-                moon_alt=self.moon_vectors["alt"][~self.quality],
-                moon_az=self.moon_vectors["az"][~self.quality],
-                moon_dist=self.moon_vectors["dist"][~self.quality],
+                earth_alt=self.earth_vectors["alt"],
+                earth_az=self.earth_vectors["az"],
+                earth_dist=self.earth_vectors["dist"],
+                moon_alt=self.moon_vectors["alt"],
+                moon_az=self.moon_vectors["az"],
+                moon_dist=self.moon_vectors["dist"],
                 earth_alt_map=self.earth_maps["alt"],
                 earth_az_map=self.earth_maps["az"],
                 earth_dist_map=self.earth_maps["dist"],
