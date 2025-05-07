@@ -309,6 +309,7 @@ class BackgroundCube(object):
         mask_straps: bool = False, 
         frames: Optional[Tuple] = None,
         rolling: bool = True,
+        errors: bool = True,
     ):
         """
         Computes the scattered light cube by processing FFIs.
@@ -344,6 +345,8 @@ class BackgroundCube(object):
             If True, pooling downsizing will be done with an iterative rolling windown and stride 
             that will match the output desired shape, this will make the downsizing step slower.
             If False, pooling downsizing will use fixed window and stride.
+        errors : bool, optional
+            Retrieve and propagate errors
         """
         # get dark frame
         log.info("Computing sector darkest frames...")
@@ -387,8 +390,11 @@ class BackgroundCube(object):
             pixel_counts = np.ones(flux_cube.shape[1:], dtype=int)
 
         elif self.downsize == "binning":
+            times = int(np.log2(self.img_bin))
             # all pixels the binning with seld.
             flux_cube = []
+            if errors:
+                flux_e_cube = []
             # make a static scene from median of darkes frames
             if not hasattr(self, "static"):
                 self.static = self._get_static_scene()
@@ -414,7 +420,6 @@ class BackgroundCube(object):
                 current[mask_pixels] = np.nan
                 current -= self.static
                 if rolling:
-                    times = int(np.log2(self.img_bin))
                     for k in range(times):
                         current = pooling_2d(
                             current,
@@ -430,7 +435,18 @@ class BackgroundCube(object):
                             stride=self.img_bin,
                             stat=np.nanmedian,
                         )
-                
+                if errors:
+                    # collect errors
+                    err = self.tcube.get_ffi(f)[2].data[
+                        self.rmin : self.rmax, self.cmin : self.cmax
+                    ]
+                    err = pooling_2d(
+                        err,
+                        kernel_size=self.img_bin,
+                        stride=self.img_bin,
+                        stat=np.nanmean,
+                    )
+                    flux_e_cube.append(err)
                 
 
                 flux_cube.append(current)
@@ -442,6 +458,9 @@ class BackgroundCube(object):
                 aux[fi:ff:step] = flux_cube
                 flux_cube = aux
             # count the number of valid pixels in each bin
+            # when rolling is True, the number of pixels that contribuite to a bin is not easy to 
+            # define due to the stride + window side + rolling. In this case we simplify and use 
+            # the full size + stride to approximate the pixel counts. 
             pixel_counts = np.ones((self.rmax - self.rmin, self.cmax - self.cmin))
             pixel_counts[mask_pixels] = np.nan
             pixel_counts = pooling_2d(
@@ -450,6 +469,11 @@ class BackgroundCube(object):
                 stride=self.img_bin,
                 stat=np.nansum,
             ).astype(int)
+            # replace bins with zero count with sample values, but keep 0s where the resulting flux is nan
+            nzeros = (pixel_counts == 0).sum()
+            print(nzeros)
+            pixel_counts[pixel_counts == 0] = np.random.choice(pixel_counts.ravel(), nzeros)
+            pixel_counts[np.isnan(flux_cube[0])] = 0
 
         else:
             log.info("Wrong pixel grid option...")
@@ -460,6 +484,14 @@ class BackgroundCube(object):
 
         self.scatter_cube = flux_cube
         self.pixel_counts = pixel_counts
+        if errors:
+            # propagate errors
+            self.scatter_err_cube = np.array(flux_e_cube)
+            # use aprox when dist is close to normal
+            self.scatter_err_cube = 1.253 * (self.scatter_err_cube / np.sqrt(pixel_counts))
+        else:
+            # if no error collection we use Poison approx
+            self.scatter_err_cube = np.sqrt(flux_cube) / pixel_counts
         
         return
 
@@ -733,6 +765,7 @@ class BackgroundCube(object):
 
         # agregate cubes/arrays in the time axis
         self.scatter_cube_bin = np.array([np.mean(self.scatter_cube[x], axis=0) for x in indices])
+        self.scatter_err_cube_bin = np.array([np.mean(self.scatter_err_cube[x], axis=0) for x in indices])
         self.time_bin = np.array([np.mean(self.time[x], axis=0) for x in indices])
         self.cadenceno_bin = np.array([np.mean(self.cadenceno[x], axis=0) for x in indices])
 
@@ -777,14 +810,14 @@ class BackgroundCube(object):
             Header unit list with data and metadata
         """
         if self.time_binned and binned:
-            cube_sets = np.array([self.scatter_cube_bin, np.sqrt(self.scatter_cube_bin)])
+            cube_sets = np.array([self.scatter_cube_bin, self.scatter_err_cube_bin])
             time_col = self.time_bin
         else:
-            cube_sets = np.array([self.scatter_cube])#, np.sqrt(self.scatter_err_cube)])
+            cube_sets = np.array([self.scatter_cube, self.scatter_err_cube])
             time_col = self.time
 
         priheader = self.tcube.primary_hdu.header.copy()
-        # del priheader["NAXIS1"], priheader["NAXIS2"], priheader["NAXIS3"], priheader["NAXIS4"]
+        del priheader["NAXIS1"], priheader["NAXIS2"], priheader["NAXIS3"], priheader["NAXIS4"]
         
         prihdu = fits.PrimaryHDU(header=priheader)
 
