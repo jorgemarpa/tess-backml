@@ -76,16 +76,18 @@ class ScatterLightCorrector:
         """Return a string representation of the ScatterLightCorrector object."""
         return f"TESS FFI SL Corrector (Sector, Camera, CCD): {self.sector}, {self.camera}, {self.ccd}"
 
-    def get_original_ffi_times(self):
+    def get_original_ffi_times(self) -> np.ndarray:
+    
         """
         Retrieve the original frame times from FFIs.
 
         Returns
         -------
-        None
+        np.ndarray
+            Array of original frame times in JD format.
         """
         tcube = TESSCube(sector=self.sector, camera=self.camera, ccd=self.ccd)
-        self.ffi_times = tcube.time + self.btjd0
+        return tcube.time + self.btjd0
 
     def _interpolate_pixel(
         self, row_eval: np.ndarray, col_eval: np.ndarray

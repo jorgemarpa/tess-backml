@@ -306,7 +306,7 @@ class BackgroundCube(object):
     def get_scatter_light_cube(
         self, 
         plot: bool = False, 
-        mask_straps: bool = False, 
+        mask_straps: bool = True, 
         frames: Optional[Tuple] = None,
         rolling: bool = True,
         errors: bool = True,
@@ -853,7 +853,7 @@ class BackgroundCube(object):
             hdul.writeto(out_file, overwrite=True)
             return
 
-    def save_data_npz(self, out_file: Optional[str] = None, save_maps: bool = False):
+    def save_to_npz(self, out_file: Optional[str] = None, save_maps: bool = False):
         """
         Saves the processed background data to a NumPy .npz file.
 

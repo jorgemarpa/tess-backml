@@ -21,7 +21,7 @@ def build_dataset(
         sector=sector, camera=camera, ccd=ccd, img_bin=img_bin, downsize=downsize
     )
     log.info(bkg_data)
-    bkg_data.get_scatter_light_cube(frames=None, mask_straps=True, plot=False)
+    bkg_data.get_scatter_light_cube(frames=None, mask_straps=True, plot=False, rolling=True)
     
     if plot:
         fig_dir = f"{out_dir}/figures/sector{sector:03}"
@@ -42,7 +42,7 @@ def build_dataset(
     out_file = f"{data_dir}/ffi_cubes_bin{bkg_data.img_bin}_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.npz"
 
     log.info(f"Saving cubes to {out_file}")
-    bkg_data.save_data(out_file=out_file, save_maps=True)
+    bkg_data.save_to_npz(out_file=out_file, save_maps=True)
     log.info("Done!")
     return
 

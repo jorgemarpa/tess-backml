@@ -20,5 +20,6 @@ def get_logger():
 log = get_logger()
 
 from .bkg_data import BackgroundCube  # noqa
+from .corrector import ScatterLightCorrector  # noqa
 
-__all__ = ["BackgroundCube"]
+__all__ = ["BackgroundCube", "ScatterLightCorrector"]
