@@ -55,8 +55,8 @@ class ScatterLightCorrector:
         self.time_binsize = hdul[0].header["TIMBINS"]
         self.cube_shape = (
             hdul[0].header["TIMSIZE"],
-            hdul[0].header["IMGSIZEX"],
             hdul[0].header["IMGSIZEY"],
+            hdul[0].header["IMGSIZEX"],
         )
         self.image_binsize = hdul[0].header["PIXBIN"]
         self.cube_time = hdul[3].data["time"]
@@ -71,6 +71,10 @@ class ScatterLightCorrector:
         self.col_cube = (
             np.arange(self.cmin, self.cmax, self.image_binsize) + self.image_binsize / 2
         )
+
+    def __repr__(self):
+        """Return a string representation of the ScatterLightCorrector object."""
+        return f"TESS FFI SL Corrector (Sector, Camera, CCD): {self.sector}, {self.camera}, {self.ccd}"
 
     def get_original_ffi_times(self):
         """
@@ -104,7 +108,7 @@ class ScatterLightCorrector:
         sl_eval_pix = []
         for tdx in tqdm(range(len(self.cube_sl_rel)), desc="Pixel interp"):
             interp2d = RectBivariateSpline(
-                self.col_cube_rel, self.row_cube_rel, self.cube_sl_rel[tdx], kx=3, ky=3
+                self.col_cube_rel, self.row_cube_rel, self.cube_sl_rel[tdx].T, kx=3, ky=3
             )
             sl_eval_pix.append(interp2d(col_eval, row_eval).T)
 
@@ -132,9 +136,11 @@ class ScatterLightCorrector:
             self.cube_sl_rel.reshape((self.cube_sl_rel.shape[0], -1)).T,
             desc="Time interp",
         ):
-            fx = interp1d(self.cube_time_rel, pix, kind="slinear")(times)
+            fx = interp1d(
+                self.cube_time_rel, pix, kind="slinear", bounds_error=False, fill_value="extrapolate"
+            )(times)
             sl_time_inter.append(fx)
-        sl_time_inter = np.array(sl_time_inter).reshape(out_shape)
+        sl_time_inter = np.array(sl_time_inter).T.reshape(out_shape)
 
         return sl_time_inter
 
@@ -165,20 +171,22 @@ class ScatterLightCorrector:
 
         dxy = 2
         ri = np.maximum(
-            np.where(self.row_cube >= row_eval.min())[0][0] - dxy, self.rmin
+            np.where(self.row_cube >= row_eval.min())[0][0] - dxy, 0
         )
         rf = np.minimum(
-            np.where(self.row_cube <= row_eval.max())[0][-1] + dxy, self.rmax
+            np.where(self.row_cube <= row_eval.max())[0][-1] + dxy, 
+            self.cube_shape[1] - 1
         )
         ci = np.maximum(
-            np.where(self.col_cube >= col_eval.min())[0][0] - dxy, self.cmin
+            np.where(self.col_cube >= col_eval.min())[0][0] - dxy, 0
         )
         cf = np.minimum(
-            np.where(self.col_cube <= col_eval.max())[0][-1] + dxy, self.cmax
+            np.where(self.col_cube <= col_eval.max())[0][-1] + dxy, 
+            self.cube_shape[2] - 1
         )
         log.info(f"[row,col] range  [{ri}:{rf}, {ci}:{cf}]")
         self.cube_sl_rel = self.cube_sl[ti:tf, ri:rf, ci:cf].copy()
-        self.cube_sl_rel_ = self.cube_sl_rel.copy()
+        self.cube_sl_rel_org = self.cube_sl_rel.copy()
         self.cube_time_rel = self.cube_time[ti:tf]
         self.row_cube_rel = self.row_cube[ri:rf]
         self.col_cube_rel = self.col_cube[ci:cf]
@@ -240,6 +248,7 @@ class ScatterLightCorrector:
             )
             if self.time_binned:
                 self.cube_sl_rel = self._interpolate_times(times=times)
+                self.cube_sl_rel_times = self.cube_sl_rel.copy()
             sl_eval = self._interpolate_pixel(row_eval=row_eval, col_eval=col_eval)
 
         elif method == "nn":
