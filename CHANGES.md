@@ -1,3 +1,7 @@
+# 0.3.0 (unreleased)
+- Corrector class that uses scatter light cubes in disk to interpolate SL model in a given pixel-time grid
+- Corrector returns interpolated flux and flux errors
+
 # 0.2.0 (2025-05-07)
 - Collect and propagate errors
 - No inplace operations when time binning
