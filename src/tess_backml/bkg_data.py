@@ -482,8 +482,8 @@ class BackgroundCube(object):
             log.info("Filling nans with interpolation...")
             flux_cube = fill_nans_interp(flux_cube)
 
-        self.scatter_cube = flux_cube
-        self.pixel_counts = pixel_counts
+        self.scatter_cube = flux_cube.astype(np.float32)
+        self.pixel_counts = pixel_counts.astype(np.int64)
         if errors:
             # propagate errors
             self.scatter_err_cube = np.array(flux_e_cube)
