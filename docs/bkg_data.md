@@ -10,8 +10,9 @@
         - plot_dark_frame
         - get_scatter_light_cube
         - get_vector_maps
-        - time_bin
-        - save_data
+        - bin_time_axis
+        - save_to_fits
+        - save_to_npz
         - animate_data
       show_root_heading: true
       show_source: false

@@ -3,9 +3,12 @@ nav:
   - Home: index.md
   - API: 
     - bkg_data.md
+    - corrector.md
     - utils.md
   - Tutorials:
-    - Tutorial 1: tutorial_1.ipynb
+    - Data Cubes: t1_bkgcube.ipynb
+    - Scatter Light Cube: t2_slcube.ipynb 
+    - Scatter Light Corrector: t3_slcorrector.ipynb
 
 extra:
     social:

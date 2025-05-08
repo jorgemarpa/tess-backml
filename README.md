@@ -42,7 +42,7 @@ tess_bkg = BackgroundCube(
 )
 
 # get the flux data from MAST/AWS, compute scatter light and downsize
-tess_bkg.get_scatter_light_cube(frames=None, mask_straps=True, plot=False)
+tess_bkg.get_scatter_light_cube(plot=False)
 # compute the vector maps for the Earth and Moon
 tess_bkg.get_vector_maps(ang_size=True)
 
