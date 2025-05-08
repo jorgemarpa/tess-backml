@@ -53,7 +53,7 @@ bkg_data.get_scatter_light_cube(frames=None, mask_straps=True, plot=True, rollin
 
 bkg_data.bin_time_axis(bin_size=2.0)
 
-fname = f"./data/ffi_cubes_sector{sector:03}_{camera}-{ccd}_light.fits"
+fname = f"./data/ffi_sl_cube_sector{sector:03}_{camera}-{ccd}.fits"
 _ = bkg_data.save_to_fits(out_file=fname, binned=True)
 ```
 This saves a FITS file that can be used later to correct any TPF.
