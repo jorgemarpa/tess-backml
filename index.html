@@ -264,7 +264,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="tutorial_1/" class="md-tabs__link">
+        <a href="t1_bkgcube/" class="md-tabs__link">
           
   
   
@@ -378,9 +378,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    <span class="md-ellipsis">
+      TL,DR
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       Install
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scatter-light-cube" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scatter Light Cube
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#angle-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Angle Maps
     </span>
   </a>
   
@@ -392,6 +419,39 @@
       Usage
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-sl-cube" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a SL Cube
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct-sl-in-tpf" class="md-nav__link">
+    <span class="md-ellipsis">
+      Correct SL in TPF
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-ml-training-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create ML Training Set
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -457,6 +517,29 @@
   
   <span class="md-ellipsis">
     BackgroundCube
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="corrector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ScatterLightCorrector
     
   </span>
   
@@ -545,12 +628,58 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorial_1/" class="md-nav__link">
+      <a href="t1_bkgcube/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Tutorial 1
+    Data Cubes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="t2_slcube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scatter Light Cube
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="t3_slcorrector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scatter Light Corrector
     
   </span>
   
@@ -595,9 +724,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    <span class="md-ellipsis">
+      TL,DR
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       Install
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scatter-light-cube" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scatter Light Cube
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#angle-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Angle Maps
     </span>
   </a>
   
@@ -609,6 +765,39 @@
       Usage
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-sl-cube" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create a SL Cube
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct-sl-in-tpf" class="md-nav__link">
+    <span class="md-ellipsis">
+      Correct SL in TPF
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-ml-training-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create ML Training Set
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -632,80 +821,137 @@
 
 
 <h1 id="tess-back-ml">TESS Back ML</h1>
-<p>This is a Python package to create training data to be used for a neural network (NN) 
-model that predicts the TESS Full Frame Image (FFI) background signal, in particular,
- the time-changing scattered light.</p>
-<p>This animation shows the scattered light of a TESS FFI. The original 2048 x 2048 pixel 
-image was downsized to 128 x 128 pixels to be memory efficient.</p>
-<p><img alt="scatt_cube" src="figures/ffi_scatterlight_bin16_sector001_3-4.gif" /></p>
-<p>The next figure shows the vector maps (distance, elevation, and azimuth angles) for 
-Earth and Moon with respect to the camera boresight. These maps have the same shape as
-the scatter light cube shown above.</p>
-<p><img alt="earth_maps" src="figures/earth_vector_maps.png" /></p>
+<h2 id="tldr">TL,DR</h2>
+<p>This is a Python package to create specialized support data from the TESS Full Frame Image (FFI).
+With <code>tess-backml</code> you can isolate the scatter light (SL) contribution to FFIs and create downsize versions of the cubes for multiple uses: 
+- One use is to correct the SL signal in any FFI cutout by interpolating from a downsize version of the 
+cube. 
+- Another use is to create a machine learning training set with the SL cube and pixel maps of how the
+Earth and Moon angles change during sector observations. These two are the main contributions to the background signal. 
+- This package, also will enable ML model evaluation to correct the scatter light on the fly.</p>
 <h2 id="install">Install</h2>
 <p>Install from this GitHub repository with</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip install git+https://github.com/jorgemarpa/tess-backml
 </span></code></pre></div>
 <p>PyPI will available shortly.</p>
+<h2 id="scatter-light-cube">Scatter Light Cube</h2>
+<p>This animation shows the scattered light of a TESS FFI. The original 2048 x 2048 pixel 
+image was downsized to 128 x 128 pixels.</p>
+<p><img alt="scatt_cube" src="figures/ffi_scatterlight_bin16_sector001_3-4.gif" /></p>
+<h2 id="angle-maps">Angle Maps</h2>
+<p>The next figure shows the vector maps (distance, elevation, and azimuth angles) for 
+Earth and Moon with respect to the camera boresight. These maps have the same shape as
+the scatter light cube shown above.</p>
+<p><img alt="earth_maps" src="figures/earth_vector_maps.png" /></p>
 <h2 id="usage">Usage</h2>
-<p>To get the data follow the steps:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tess_backml</span><span class="w"> </span><span class="kn">import</span> <span class="n">Background_Data</span>
+<h3 id="create-a-sl-cube">Create a SL Cube</h3>
+<p>From the original FFI cube size (~1200 times, 2k, 2k), we can extract and compute a downsize version
+of the SL by doing pixel binning and time binning. The resulting SL cube has typically shape (~300, 256, 256).</p>
+<p><div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tess_backml</span><span class="w"> </span><span class="kn">import</span> <span class="n">BackgroundCube</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># initialize the object for given sector/camera/ccd</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># will do 16x16 pixel binning</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">tess_bkg</span> <span class="o">=</span> <span class="n">BackgroundCube</span><span class="p">(</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">sector</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">img_bin</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">downsize</span><span class="o">=</span><span class="s2">&quot;binning&quot;</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">)</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">bkg_data</span> <span class="o">=</span> <span class="n">BackgroundCube</span><span class="p">(</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">sector</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">img_bin</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">downsize</span><span class="o">=</span><span class="s2">&quot;binning&quot;</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">bkg_data</span><span class="o">.</span><span class="n">get_scatter_light_cube</span><span class="p">(</span><span class="n">frames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask_straps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rolling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># get the flux data from MAST/AWS, compute scatter light and downsize</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">get_scatter_light_cube</span><span class="p">(</span><span class="n">frames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask_straps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># compute the vector maps for the Earth and Moon</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">get_vector_maps</span><span class="p">(</span><span class="n">ang_size</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="c1"># make an animation of the scatter light cube</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">animate_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;sl&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="c1"># save data to disk</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">save_data</span><span class="p">(</span><span class="n">save_maps</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">bkg_data</span><span class="o">.</span><span class="n">bin_time_axis</span><span class="p">(</span><span class="n">bin_size</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;./data/ffi_cubes_sector</span><span class="si">{</span><span class="n">sector</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">ccd</span><span class="si">}</span><span class="s2">_light.fits&quot;</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="n">_</span> <span class="o">=</span> <span class="n">bkg_data</span><span class="o">.</span><span class="n">save_to_fits</span><span class="p">(</span><span class="n">out_file</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">binned</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
+This saves a FITS file that can be used later to correct any TPF.
+For more details see the <a href="t2_slcube/">SL Cube Tutorial</a>.</p>
+<h3 id="correct-sl-in-tpf">Correct SL in  TPF</h3>
+<p>Once we have a FITS file with the SL cube, we can use the corrector object to interpolate to
+the desired pixels and times, and correct the background SL.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lk</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tesscube</span><span class="w"> </span><span class="kn">import</span> <span class="n">TESSCube</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tess_backml.corrector</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScatterLightCorrector</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">tcube</span> <span class="o">=</span> <span class="n">TESSCube</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># this is pseudo code</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">tpf</span> <span class="o">=</span> <span class="n">tcube</span><span class="o">.</span><span class="n">get_tpf</span><span class="p">(</span><span class="o">&lt;</span><span class="n">TIC</span> <span class="n">coords</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="c1"># Corrector object</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">slcorr</span> <span class="o">=</span> <span class="n">ScatterLightCorrector</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="n">fname</span><span class="p">)</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="c1"># pixel array for evaluation</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">row_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">tpf</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="n">tpf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="n">col_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="n">tpf</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="n">tpf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="c1"># time array for evaluation</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="n">time_eval</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">slcorr</span><span class="o">.</span><span class="n">btjd0</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="c1"># evaluate the SL model at given pixel/times</span>
+</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="n">sl_eval</span> <span class="o">=</span> <span class="n">slcorr</span><span class="o">.</span><span class="n">evaluate_scatterlight_model</span><span class="p">(</span>
+</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>    <span class="n">row_eval</span><span class="o">=</span><span class="n">row_eval</span><span class="p">,</span> <span class="n">col_eval</span><span class="o">=</span><span class="n">col_eval</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="n">time_eval</span>
+</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="p">)</span>
+</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>
+</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="c1"># subtract the SL model</span>
+</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="n">flux_corr</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">flux</span> <span class="o">-</span> <span class="n">sl_eval</span> <span class="o">*</span> <span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span>
+</span></code></pre></div>
+<p>For more details see the <a href="t3_slcorrector/">Corrector Tutorial</a>.</p>
+<h3 id="create-ml-training-set">Create ML Training Set</h3>
+<p>To get the training data follow the steps:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tess_backml</span><span class="w"> </span><span class="kn">import</span> <span class="n">Background_Data</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># initialize the object for given sector/camera/ccd</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># will do 16x16 pixel binning</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">tess_bkg</span> <span class="o">=</span> <span class="n">BackgroundCube</span><span class="p">(</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">sector</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">img_bin</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">downsize</span><span class="o">=</span><span class="s2">&quot;binning&quot;</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># get the flux data from MAST/AWS, compute scatter light and downsize</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">get_scatter_light_cube</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># compute the vector maps for the Earth and Moon</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">get_vector_maps</span><span class="p">(</span><span class="n">ang_size</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># make an animation of the scatter light cube</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">animate_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;sl&quot;</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="c1"># save data to disk</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="n">tess_bkg</span><span class="o">.</span><span class="n">save_to_npz</span><span class="p">(</span><span class="n">save_maps</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Or you can run a Python script <code>build_dataset.py</code> in the terminal (plotting flag is optional and will add
 run time):
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>usage: build_dataset.py [-h] [--sector SECTOR] [--camera CAMERA] [--ccd CCD] [--downsize DOWNSIZE] [--image-bin IMG_BIN] [--plot]
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>                        [--out-dir OUT_DIR]
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>Build TESS FFI background dataset for a Sector/Camera/CCD.
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>options:
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  -h, --help           show this help message and exit
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  --sector SECTOR      TESS sector.
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  --camera CAMERA      TESS camera.
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  --ccd CCD            TESS camera.
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  --downsize DOWNSIZE  Method for downsizing the image, one of [sparse, binning].
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>  --image-bin IMG_BIN  Image binning size, must divide 2048.
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>  --plot               Plot target light curve.
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>  --out-dir OUT_DIR    Outputh directory path where files and figures will be saved.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>usage: build_dataset.py [-h] [--sector SECTOR] [--camera CAMERA] [--ccd CCD] [--downsize DOWNSIZE] [--image-bin IMG_BIN] [--plot]
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>                        [--out-dir OUT_DIR]
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Build TESS FFI background dataset for a Sector/Camera/CCD.
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>options:
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>  -h, --help           show this help message and exit
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>  --sector SECTOR      TESS sector.
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>  --camera CAMERA      TESS camera.
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>  --ccd CCD            TESS camera.
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>  --downsize DOWNSIZE  Method for downsizing the image, one of [sparse, binning].
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>  --image-bin IMG_BIN  Image binning size, must divide 2048.
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>  --plot               Plot target light curve.
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>  --out-dir OUT_DIR    Outputh directory path where files and figures will be saved.
 </span></code></pre></div>
 For example
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python build_dataset.py --sector 3 --camera 1 --ccd 2 --image-bin 16 --downsize binning --plot
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python build_dataset.py --sector 3 --camera 1 --ccd 2 --image-bin 16 --downsize binning --plot
 </span></code></pre></div></p>
 <p>The script will save <code>npz</code> files with the following dictionary:
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>&quot;scatter_cube&quot;:   the data cube with the scatter light, shape [nt, 128, 128] depending on the binsize (16)
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>&quot;time&quot;:           time array in JD
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>&quot;cadenceno&quot;:      cadence number array
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>&quot;earth_alt&quot;:      Earth altitude angle from the camera boresight
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>&quot;earth_az&quot;:       Earth azimuth angle from the camera boresight
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>&quot;earth_dist&quot;:     Earth distance from the camera boresight
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>&quot;moon_alt&quot;:       Moon altitude angle from the camera boresight
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>&quot;moon_az&quot;:        Moon azimuth angle from the camera boresight
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>&quot;moon_dist&quot;:      Moon distance from the camera boresight
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>&quot;earth_alt_map&quot;:  Earth altitude angle map for every pixel, same shape as `scatter_cube`
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>&quot;earth_az_map&quot;:   Earth azimuth angle map for every pixel 
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>&quot;earth_dist_map&quot;: Earth angular size map for every pixel 
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>&quot;moon_alt_map&quot;:   Moon altitude angle map for every pixel 
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>&quot;moon_az_map&quot;:    Moon azimuth angle map for every pixel 
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>&quot;moon_dist_map&quot;:  Moon angular size map for every pixel 
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>&quot;scatter_cube&quot;:   the data cube with the scatter light, shape [nt, 128, 128] depending on the binsize (16)
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>&quot;time&quot;:           time array in JD
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>&quot;cadenceno&quot;:      cadence number array
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>&quot;earth_alt&quot;:      Earth altitude angle from the camera boresight
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>&quot;earth_az&quot;:       Earth azimuth angle from the camera boresight
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>&quot;earth_dist&quot;:     Earth distance from the camera boresight
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>&quot;moon_alt&quot;:       Moon altitude angle from the camera boresight
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>&quot;moon_az&quot;:        Moon azimuth angle from the camera boresight
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>&quot;moon_dist&quot;:      Moon distance from the camera boresight
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>&quot;earth_alt_map&quot;:  Earth altitude angle map for every pixel, same shape as `scatter_cube`
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>&quot;earth_az_map&quot;:   Earth azimuth angle map for every pixel 
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>&quot;earth_dist_map&quot;: Earth angular size map for every pixel 
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>&quot;moon_alt_map&quot;:   Moon altitude angle map for every pixel 
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>&quot;moon_az_map&quot;:    Moon azimuth angle map for every pixel 
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>&quot;moon_dist_map&quot;:  Moon angular size map for every pixel 
 </span></code></pre></div></p>
-<p>Also check out the Jupyter notebook tutorial <a href="tutorial_1/">here</a>.</p>
+<p>For more details see the <a href="t1_bkgcube/">Data Cubes Tutorial</a>.</p>
 
 
 

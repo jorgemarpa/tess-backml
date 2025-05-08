@@ -12,7 +12,7 @@
         <link rel="prev" href="..">
       
       
-        <link rel="next" href="../utils/">
+        <link rel="next" href="../corrector/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -266,7 +266,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../tutorial_1/" class="md-tabs__link">
+        <a href="../t1_bkgcube/" class="md-tabs__link">
           
   
   
@@ -494,6 +494,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#src.tess_backml.BackgroundCube.bin_time_axis" class="md-nav__link">
+    <span class="md-ellipsis">
+      bin_time_axis
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.BackgroundCube.save_to_fits" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_to_fits
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.BackgroundCube.save_to_npz" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_to_npz
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#src.tess_backml.BackgroundCube.animate_data" class="md-nav__link">
     <span class="md-ellipsis">
       animate_data
@@ -511,6 +538,29 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../corrector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ScatterLightCorrector
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -594,12 +644,58 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial_1/" class="md-nav__link">
+      <a href="../t1_bkgcube/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Tutorial 1
+    Data Cubes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../t2_slcube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scatter Light Cube
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../t3_slcorrector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scatter Light Corrector
     
   </span>
   
@@ -684,6 +780,33 @@
   <a href="#src.tess_backml.BackgroundCube.get_vector_maps" class="md-nav__link">
     <span class="md-ellipsis">
       get_vector_maps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.BackgroundCube.bin_time_axis" class="md-nav__link">
+    <span class="md-ellipsis">
+      bin_time_axis
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.BackgroundCube.save_to_fits" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_to_fits
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.BackgroundCube.save_to_npz" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_to_npz
     </span>
   </a>
   
@@ -899,7 +1022,7 @@ Default is False.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_scatter_light_cube</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plot</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">mask_straps</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">mask_straps</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">frames</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="typing.Tuple">Tuple</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">rolling</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">errors</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -939,7 +1062,7 @@ Default is False.</p>
         <li class="doc-section-item field-body">
             <b><code>mask_straps</code></b>
               (<code><span title="bool">bool</span></code>, default:
-                  <code>False</code>
+                  <code>True</code>
 )
           –
           <div class="doc-md-description">
@@ -1023,6 +1146,148 @@ Also stores the boresight vectors for reference.</p>
             <p>If True, the 'dist' maps and vectors represent angular size (degrees).
 If False, they represent physical distance ([m] for maps).
 Default is True.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="src.tess_backml.BackgroundCube.bin_time_axis" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">bin_time_axis</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">bin_time_axis</span><span class="p">(</span><span class="n">bin_size</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">2.5</span><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Performs temporal binning on the calculated data cubes and vectors.</p>
+<p>If <code>self.time_bin</code> is greater than 1, this method bins the time axis
+of <code>scatter_cube</code>, <code>time</code>, <code>cadenceno</code>, and all Earth/Moon vector maps
+and boresight vectors by taking the mean or median within each time bin.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>bin_size</code></b>
+              (<code><span title="float">float</span></code>, default:
+                  <code>2.5</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Bin size for time axis in units of hours (e.g. 2.5 hours).</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="src.tess_backml.BackgroundCube.save_to_fits" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">save_to_fits</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">save_to_fits</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">out_file</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">binned</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Saves the downsize version of the scatter light cube as a FITS file similar to
+the MAST FFI cubes.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>out_file</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Path to the output .npz file. If None, a default filename is
+generated based on sector, camera, ccd, and binning factor, saved
+in the current directory. Default is None.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+<b><code>hdul</code></b> (              <code>HDUList object</code>
+)          –
+          <div class="doc-md-description">
+            <p>Header unit list with data and metadata</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="src.tess_backml.BackgroundCube.save_to_npz" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">save_to_npz</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">save_to_npz</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">out_file</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_maps</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Saves the processed background data to a NumPy .npz file.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>out_file</code></b>
+              (<code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Path to the output .npz file. If None, a default filename is
+generated based on sector, camera, ccd, and binning factor, saved
+in the current directory. Default is None.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>save_maps</code></b>
+              (<code><span title="bool">bool</span></code>, default:
+                  <code>False</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>If True, saves the detailed pixel-wise maps for Earth and Moon
+angles/distances alongside the scatter cube and boresight vectors.
+If False, saves only the scatter cube, time, cadence, and boresight
+vectors (smaller file size). Default is False.</p>
           </div>
         </li>
     </ul>
@@ -1180,13 +1445,13 @@ for displaying the animation. Otherwise returns None.</p>
         
         
           
-          <a href="../utils/" class="md-footer__link md-footer__link--next" aria-label="Next: Utils">
+          <a href="../corrector/" class="md-footer__link md-footer__link--next" aria-label="Next: ScatterLightCorrector">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Utils
+                ScatterLightCorrector
               </div>
             </div>
             <div class="md-footer__button md-icon">

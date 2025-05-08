@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../bkg_data/">
+        <link rel="prev" href="../corrector/">
       
       
-        <link rel="next" href="../tutorial_1/">
+        <link rel="next" href="../t1_bkgcube/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -266,7 +266,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../tutorial_1/" class="md-tabs__link">
+        <a href="../t1_bkgcube/" class="md-tabs__link">
           
   
   
@@ -418,6 +418,29 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../corrector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ScatterLightCorrector
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -490,6 +513,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#src.tess_backml.utils.fill_nans_interp" class="md-nav__link">
+    <span class="md-ellipsis">
+      fill_nans_interp
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#src.tess_backml.utils.plot_img" class="md-nav__link">
     <span class="md-ellipsis">
       plot_img
@@ -502,6 +534,24 @@
   <a href="#src.tess_backml.utils.animate_cube" class="md-nav__link">
     <span class="md-ellipsis">
       animate_cube
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.utils.int_to_binary_array" class="md-nav__link">
+    <span class="md-ellipsis">
+      int_to_binary_array
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.utils.has_bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_bit
     </span>
   </a>
   
@@ -576,12 +626,58 @@
   
   
     <li class="md-nav__item">
-      <a href="../tutorial_1/" class="md-nav__link">
+      <a href="../t1_bkgcube/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Tutorial 1
+    Data Cubes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../t2_slcube/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scatter Light Cube
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../t3_slcorrector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Scatter Light Corrector
     
   </span>
   
@@ -645,6 +741,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#src.tess_backml.utils.fill_nans_interp" class="md-nav__link">
+    <span class="md-ellipsis">
+      fill_nans_interp
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#src.tess_backml.utils.plot_img" class="md-nav__link">
     <span class="md-ellipsis">
       plot_img
@@ -657,6 +762,24 @@
   <a href="#src.tess_backml.utils.animate_cube" class="md-nav__link">
     <span class="md-ellipsis">
       animate_cube
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.utils.int_to_binary_array" class="md-nav__link">
+    <span class="md-ellipsis">
+      int_to_binary_array
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.tess_backml.utils.has_bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_bit
     </span>
   </a>
   
@@ -808,6 +931,61 @@ by default np.nanmedian.</p>
           –
           <div class="doc-md-description">
             <p>A 2D numpy array representing the pooled output.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="src.tess_backml.utils.fill_nans_interp" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">fill_nans_interp</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">fill_nans_interp</span><span class="p">(</span><span class="n">cube</span><span class="p">:</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">,</span> <span class="n">deg</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Replace nan values in a data cube using plynomial interpolation</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>cube</code></b>
+              (<code><span title="numpy.ndarray">ndarray</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>Data cube with nan values to be interpolated</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>deg</code></b>
+              (<code><span title="int">int</span></code>, default:
+                  <code>3</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Degree of polynomial, defualt is 3.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="numpy.ndarray">ndarray</span></code>
+          –
+          <div class="doc-md-description">
+            <p>Interpolated data cube without nan values</p>
           </div>
         </li>
     </ul>
@@ -1153,6 +1331,118 @@ by default np.nanmedian.</p>
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h3 id="src.tess_backml.utils.int_to_binary_array" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">int_to_binary_array</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">int_to_binary_array</span><span class="p">(</span><span class="n">integer</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span> <span class="n">num_bits</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Converts a non-negative integer to its binary representation as a NumPy array.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>integer</code></b>
+              (<code><span title="int">int</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>The non-negative integer to convert.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>num_bits</code></b>
+              (<code><span title="int">int</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>The desired number of bits in the output binary representation.
+The binary string will be left-padded with zeros if necessary.
+Must be greater than zero.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="numpy.ndarray">ndarray</span></code>
+          –
+          <div class="doc-md-description">
+            <p>A NumPy array of dtype uint8 representing the binary digits (0 or 1),
+with the most significant bit first. The length of the array is <code>num_bits</code>.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="src.tess_backml.utils.has_bit" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">has_bit</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">has_bit</span><span class="p">(</span><span class="n">quality_array</span><span class="p">:</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">,</span> <span class="n">bit</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Checks if a specific bit is set in each element of a quality flag array.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>quality_array</code></b>
+              (<code><span title="numpy.ndarray">ndarray</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>A NumPy array of integers (quality flags).</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>bit</code></b>
+              (<code><span title="int">int</span></code>)
+          –
+          <div class="doc-md-description">
+            <p>The bit position to check (1-based index, where 1 is the LSB).
+Must be between 1 and 16 (inclusive).</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Returns:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><span title="numpy.ndarray">ndarray</span></code>
+          –
+          <div class="doc-md-description">
+            <p>A boolean NumPy array of the same shape as <code>quality_array</code>, where
+True indicates that the specified <code>bit</code> is set (1) in the
+corresponding quality flag integer.</p>
+          </div>
+        </li>
+    </ul>
+
+
+    </div>
+
+</div>
+
 
 
   </div>
@@ -1189,7 +1479,7 @@ by default np.nanmedian.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../bkg_data/" class="md-footer__link md-footer__link--prev" aria-label="Previous: BackgroundCube">
+          <a href="../corrector/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ScatterLightCorrector">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1199,20 +1489,20 @@ by default np.nanmedian.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                BackgroundCube
+                ScatterLightCorrector
               </div>
             </div>
           </a>
         
         
           
-          <a href="../tutorial_1/" class="md-footer__link md-footer__link--next" aria-label="Next: Tutorial 1">
+          <a href="../t1_bkgcube/" class="md-footer__link md-footer__link--next" aria-label="Next: Data Cubes">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Tutorial 1
+                Data Cubes
               </div>
             </div>
             <div class="md-footer__button md-icon">
