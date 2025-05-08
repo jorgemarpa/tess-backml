@@ -184,7 +184,7 @@ class ScatterLightCorrector:
         self.col_cube_rel = self.col_cube[ci:cf]
         return
 
-    def get_scatterlight_model(
+    def evaluate_scatterlight_model(
         self,
         row_eval: np.ndarray,
         col_eval: np.ndarray,
