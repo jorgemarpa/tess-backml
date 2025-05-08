@@ -1574,7 +1574,7 @@ bkg_data.time_bin.shape, bkg_data.scatter_cube_bin.shape</div>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
@@ -1587,11 +1587,11 @@ bkg_data.time_bin.shape, bkg_data.scatter_cube_bin.shape</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"./data/ffi_cubes_sector</span><span class="si">{</span><span class="n">sector</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">ccd</span><span class="si">}</span><span class="s2">_light.fits"</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"./data/ffi_sl_cube_sector</span><span class="si">{</span><span class="n">sector</span><span class="si">:</span><span class="s2">03</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">camera</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">ccd</span><span class="si">}</span><span class="s2">.fits"</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 <span class="n">_</span> <span class="o">=</span> <span class="n">bkg_data</span><span class="o">.</span><span class="n">save_to_fits</span><span class="p">(</span><span class="n">out_file</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span> <span class="n">binned</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">fname = f"./data/ffi_cubes_sector{sector:03}_{camera}-{ccd}_light.fits"
+<div class="clipboard-copy-txt" id="cell-8">fname = f"./data/ffi_sl_cube_sector{sector:03}_{camera}-{ccd}.fits"
 print(fname)
 _ = bkg_data.save_to_fits(out_file=fname, binned=True)</div>
 </div>
