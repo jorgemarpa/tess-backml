@@ -1,6 +1,10 @@
 # 0.3.0 (unreleased)
 - Corrector class that uses scatter light cubes in disk to interpolate SL model in a given pixel-time grid
 - Corrector returns interpolated flux and flux errors
+- Improved documentation, tutorials, webpage, and readme.
+- SL cube in FITS file as float32
+- Added basic testing for corrector module
+- Small SL cube fits file for testing
 
 # 0.2.0 (2025-05-07)
 - Collect and propagate errors
