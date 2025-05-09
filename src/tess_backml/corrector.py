@@ -4,10 +4,10 @@ from typing import Optional, Tuple
 import numpy as np
 from astropy.io import fits
 from tesscube import TESSCube
-from tqdm import tqdm
 
-from .utils import interp_1d, interp_2d
 from . import log
+from .utils import interp_1d, interp_2d
+
 
 class ScatterLightCorrector:
     """
@@ -37,7 +37,9 @@ class ScatterLightCorrector:
 
         if fname is None:
             # fname = f"./data/ffi_sl_cube_sector{self.sector:03}_{self.camera}-{self.ccd}.fits"
-            raise ValueError("Input file name is not valid, please provide a valid file.")
+            raise ValueError(
+                "Input file name is not valid, please provide a valid file."
+            )
 
         if not os.path.isfile(fname):
             raise FileNotFoundError(f"SL cube file not found {fname}")
@@ -78,7 +80,6 @@ class ScatterLightCorrector:
         return f"TESS FFI SL Corrector (Sector, Camera, CCD): {self.sector}, {self.camera}, {self.ccd}"
 
     def get_original_ffi_times(self) -> np.ndarray:
-    
         """
         Retrieve the original frame times from FFIs.
 
@@ -116,25 +117,25 @@ class ScatterLightCorrector:
         for tdx in range(len(self.cube_flux_rel)):
             # print(self.col_cube_rel.shape, self.row_cube_rel.shape, self.cube_flux_rel[tdx].T.shape)
             flx = interp_2d(
-                x=self.col_cube_rel, 
-                y=self.row_cube_rel, 
+                x=self.col_cube_rel,
+                y=self.row_cube_rel,
                 z=self.cube_flux_rel[tdx].T,
-                x_eval=col_eval, 
+                x_eval=col_eval,
                 y_eval=row_eval,
             ).T
             flux_pix_interp.append(flx)
             flxe = interp_2d(
-                x=self.col_cube_rel, 
-                y=self.row_cube_rel, 
+                x=self.col_cube_rel,
+                y=self.row_cube_rel,
                 z=self.cube_fluxerr_rel[tdx].T,
-                x_eval=col_eval, 
+                x_eval=col_eval,
                 y_eval=row_eval,
             ).T
             fluxerr_pix_interp.append(flxe)
 
         flux_pix_interp = np.array(flux_pix_interp)
         fluxerr_pix_interp = np.array(fluxerr_pix_interp)
-        
+
         return flux_pix_interp, fluxerr_pix_interp
 
     def _interpolate_times(self, times: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -154,7 +155,11 @@ class ScatterLightCorrector:
             The interpolated flux error data. Shape is (len(times), *cube_spatial_shape).
         """
         # compute output shape
-        out_shape = (len(times), self.cube_flux_rel.shape[1], self.cube_flux_rel.shape[2])
+        out_shape = (
+            len(times),
+            self.cube_flux_rel.shape[1],
+            self.cube_flux_rel.shape[2],
+        )
 
         # do time interp for each pixel
         flux_time_inter = []
@@ -201,26 +206,22 @@ class ScatterLightCorrector:
 
         # find the cube pixel row/col range that contains the evaluation pixels
         dxy = 2
-        ri = np.maximum(
-            np.where(self.cube_row >= row_eval.min())[0][0] - dxy, 0
-        )
+        ri = np.maximum(np.where(self.cube_row >= row_eval.min())[0][0] - dxy, 0)
         rf = np.minimum(
-            np.where(self.cube_row <= row_eval.max())[0][-1] + dxy, 
-            self.cube_shape[1] - 1
+            np.where(self.cube_row <= row_eval.max())[0][-1] + dxy,
+            self.cube_shape[1] - 1,
         )
-        ci = np.maximum(
-            np.where(self.cube_col >= col_eval.min())[0][0] - dxy, 0
-        )
+        ci = np.maximum(np.where(self.cube_col >= col_eval.min())[0][0] - dxy, 0)
         cf = np.minimum(
-            np.where(self.cube_col <= col_eval.max())[0][-1] + dxy, 
-            self.cube_shape[2] - 1
+            np.where(self.cube_col <= col_eval.max())[0][-1] + dxy,
+            self.cube_shape[2] - 1,
         )
         log.info(f"[row,col] range  [{ri}:{rf}, {ci}:{cf}]")
         # assign segments of the SL cube for interp
         # have to make copies to ensure the original SL cube/times/row/col
-        # are not changed and can be used for other evaluation grids with 
+        # are not changed and can be used for other evaluation grids with
         # the same corrector obeject.
-        # `cube_flux_rel` and `cube_fluxerr_rel` are updated inplaced by 
+        # `cube_flux_rel` and `cube_fluxerr_rel` are updated inplaced by
         # the interpolation operations
         self.cube_flux_rel = self.cube_flux[ti:tf, ri:rf, ci:cf].copy()
         self.cube_fluxerr_rel = self.cube_fluxerr[ti:tf, ri:rf, ci:cf].copy()
@@ -229,7 +230,7 @@ class ScatterLightCorrector:
         self.col_cube_rel = self.cube_col[ci:cf].copy()
         # we keep a copy of the original section of the SL cube for later ref/plotting
         self.cube_flux_rel_org = self.cube_flux_rel.copy()
-        
+
         return
 
     def evaluate_scatterlight_model(
@@ -270,12 +271,12 @@ class ScatterLightCorrector:
         Notes
         -----
         (5/9/2025)
-        The errors returned by the `sl_cube` method, which are computed by interpolating 
+        The errors returned by the `sl_cube` method, which are computed by interpolating
         a downsize version of the SL errors agregation done in `tess_backml.BacgroundData`
         is not a propper account for the real uncertainties of the evaluated SL flux,
-        as the this does not account for the uncertainties of interpolation modeling. 
-        A better interpolation model could be done by using a linear modeling as done in 
-        PSFMachine. This option will be developed soon. 
+        as the this does not account for the uncertainties of interpolation modeling.
+        A better interpolation model could be done by using a linear modeling as done in
+        PSFMachine. This option will be developed soon.
         """
         # check inputs are arrays
         if not isinstance(row_eval, np.ndarray) or not isinstance(col_eval, np.ndarray):
@@ -305,11 +306,15 @@ class ScatterLightCorrector:
             )
             # do time interp
             if self.time_binned:
-                self.cube_flux_rel, self.cube_fluxerr_rel = self._interpolate_times(times=times)
+                self.cube_flux_rel, self.cube_fluxerr_rel = self._interpolate_times(
+                    times=times
+                )
                 # safekeeping copy of time interpolated low-pixel-res of the cube
                 self.cube_flux_rel_times = self.cube_flux_rel.copy()
             # do pixel interp
-            sl_flux, sl_fluxerr = self._interpolate_pixel(row_eval=row_eval, col_eval=col_eval)
+            sl_flux, sl_fluxerr = self._interpolate_pixel(
+                row_eval=row_eval, col_eval=col_eval
+            )
             # THIS IS NOT CORRRECT
             # account for pixel binning error prop
             sl_fluxerr *= self.image_binsize

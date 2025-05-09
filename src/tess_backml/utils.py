@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.visualization import simple_norm
 from matplotlib import animation, axes, colors
-from tqdm import tqdm
 from scipy.interpolate import RectBivariateSpline, interp1d
+from tqdm import tqdm
 
 
 def pooling_2d(
@@ -76,12 +76,14 @@ def pooling_2d(
     if pad_h_amount > 0 or pad_w_amount > 0:
         # np.pad expects ((pad_top, pad_bottom), (pad_left, pad_right))
         # Here, pad_h_amount is for top AND bottom, pad_w_amount for left AND right.
-        padded_array = np.pad(input_array,
-                              ((pad_h_amount, pad_h_amount), (pad_w_amount, pad_w_amount)),
-                              mode='constant',
-                              constant_values=np.nan)
+        padded_array = np.pad(
+            input_array,
+            ((pad_h_amount, pad_h_amount), (pad_w_amount, pad_w_amount)),
+            mode="constant",
+            constant_values=np.nan,
+        )
     else:
-        padded_array = input_array # No padding needed or padding values were zero
+        padded_array = input_array  # No padding needed or padding values were zero
 
     current_input_height, current_input_width = padded_array.shape
 
@@ -95,7 +97,7 @@ def pooling_2d(
 
     output_height = max(0, output_height_raw)
     output_width = max(0, output_width_raw)
-    
+
     # If output_height or output_width is 0, shape_view will have a 0 dimension.
     # np.lib.stride_tricks.as_strided will create a view with this 0 dimension.
     # Subsequent application of `stat` (e.g., np.nanmedian) on such a view
@@ -103,18 +105,23 @@ def pooling_2d(
     # (e.g., shape (0, N) or (N, 0) or (0,0)), which is the desired behavior.
 
     shape_view = (output_height, output_width, kernel_size, kernel_size)
-    strides_view = (padded_array.strides[0] * stride,
-                    padded_array.strides[1] * stride,
-                    padded_array.strides[0],
-                    padded_array.strides[1])
+    strides_view = (
+        padded_array.strides[0] * stride,
+        padded_array.strides[1] * stride,
+        padded_array.strides[0],
+        padded_array.strides[1],
+    )
 
-    window_view = np.lib.stride_tricks.as_strided(padded_array, shape=shape_view, strides=strides_view)
+    window_view = np.lib.stride_tricks.as_strided(
+        padded_array, shape=shape_view, strides=strides_view
+    )
 
     output_array = stat(window_view, axis=(2, 3))
 
     return output_array
 
-def fill_nans_interp(cube: np.ndarray, deg:int = 3) -> np.ndarray:
+
+def fill_nans_interp(cube: np.ndarray, deg: int = 3) -> np.ndarray:
     """
     Replace nan values in a data cube using plynomial interpolation
 
@@ -151,6 +158,7 @@ def fill_nans_interp(cube: np.ndarray, deg:int = 3) -> np.ndarray:
         filled.append(array.reshape(xx.shape))
 
     return np.array(filled)
+
 
 def plot_img(
     img: np.ndarray,
@@ -361,6 +369,7 @@ def animate_cube(
 
     return ani
 
+
 def int_to_binary_array(integer: int, num_bits: int) -> np.ndarray:
     """
     Converts a non-negative integer to its binary representation as a NumPy array.
@@ -391,14 +400,16 @@ def int_to_binary_array(integer: int, num_bits: int) -> np.ndarray:
 
     raw_binary_string = bin(integer)[2:]
     if len(raw_binary_string) > num_bits:
-         print(f"Warning: Integer {integer} requires {len(raw_binary_string)} bits, "
-               f"but only {num_bits} requested. Result might be misleading "
-               f"if relying on implicit truncation by downstream slicing.")
+        print(
+            f"Warning: Integer {integer} requires {len(raw_binary_string)} bits, "
+            f"but only {num_bits} requested. Result might be misleading "
+            f"if relying on implicit truncation by downstream slicing."
+        )
     binary_string = raw_binary_string.zfill(num_bits)
-
 
     binary_array = np.array([int(bit) for bit in binary_string], dtype=np.uint8)
     return binary_array
+
 
 def has_bit(quality_array: np.ndarray, bit: int) -> np.ndarray:
     """
@@ -420,12 +431,15 @@ def has_bit(quality_array: np.ndarray, bit: int) -> np.ndarray:
         corresponding quality flag integer.
     """
     if not isinstance(bit, int):
-         raise TypeError("`bit` must be an integer.")
+        raise TypeError("`bit` must be an integer.")
     if not 1 <= bit <= 16:
         raise ValueError("`bit` must be between 1 and 16 (inclusive).")
 
-    mask = np.array([int_to_binary_array(int(x), 16)[-bit] for x in quality_array], dtype=bool)
+    mask = np.array(
+        [int_to_binary_array(int(x), 16)[-bit] for x in quality_array], dtype=bool
+    )
     return mask
+
 
 def interp_1d(x: np.ndarray, y: np.ndarray, x_eval: np.ndarray) -> np.ndarray:
     """
@@ -453,22 +467,23 @@ def interp_1d(x: np.ndarray, y: np.ndarray, x_eval: np.ndarray) -> np.ndarray:
         An array of the same shape as `x_eval` containing the interpolated
         values.
     """
-    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray) or not isinstance(x_eval, np.ndarray):
+    if (
+        not isinstance(x, np.ndarray)
+        or not isinstance(y, np.ndarray)
+        or not isinstance(x_eval, np.ndarray)
+    ):
         raise TypeError("Inputs x, y, and x_eval must be NumPy arrays.")
     if x.shape != y.shape:
-        raise ValueError(f"Input arrays x and y must have the same shape, but got {x.shape} and {y.shape}.")
-        
-    fn = interp1d(
-        x, y, kind="quadratic", bounds_error=False, fill_value="extrapolate"
-    )
+        raise ValueError(
+            f"Input arrays x and y must have the same shape, but got {x.shape} and {y.shape}."
+        )
+
+    fn = interp1d(x, y, kind="quadratic", bounds_error=False, fill_value="extrapolate")
     return fn(x_eval)
 
+
 def interp_2d(
-    x: np.ndarray,
-    y: np.ndarray, 
-    z: np.ndarray, 
-    x_eval: np.ndarray, 
-    y_eval: np.ndarray
+    x: np.ndarray, y: np.ndarray, z: np.ndarray, x_eval: np.ndarray, y_eval: np.ndarray
 ) -> np.ndarray:
     """
     Performs 1D linear interpolation or extrapolation.
@@ -495,15 +510,19 @@ def interp_2d(
         An array of the same shape as `x_eval` containing the interpolated
         values.
     """
-    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray) or not isinstance(z, np.ndarray):
+    if (
+        not isinstance(x, np.ndarray)
+        or not isinstance(y, np.ndarray)
+        or not isinstance(z, np.ndarray)
+    ):
         raise TypeError("Inputs x, y, and z must be NumPy arrays.")
     if not isinstance(x_eval, np.ndarray) or not isinstance(y_eval, np.ndarray):
         raise TypeError("Inputs x_eval and y_eval must be NumPy arrays.")
 
     if x.shape[0] != z.shape[0]:
-        raise ValueError(f"Input arrays x and z must have the same shape in axis 1.")
+        raise ValueError("Input arrays x and z must have the same shape in axis 1.")
     if y.shape[0] != z.shape[1]:
-        raise ValueError(f"Input arrays y and z must have the same shape in axis 2.")
-        
+        raise ValueError("Input arrays y and z must have the same shape in axis 2.")
+
     fn = RectBivariateSpline(x, y, z, kx=3, ky=3)
     return fn(x_eval, y_eval)
