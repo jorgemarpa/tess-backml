@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import logging
 import os
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
 
 # Configure logging

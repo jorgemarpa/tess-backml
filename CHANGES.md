@@ -1,4 +1,4 @@
-# 0.3.0 (unreleased)
+# 0.3.0 ((2025-05-09)
 - Corrector class that uses scatter light cubes in disk to interpolate SL model in a given pixel-time grid
 - Corrector returns interpolated flux and flux errors
 - Improved documentation, tutorials, webpage, and readme.
