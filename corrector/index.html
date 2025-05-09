@@ -899,9 +899,9 @@ path is constructed based on the sector, camera, and CCD.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate_scatterlight_model</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">row_eval</span><span class="p">:</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">col_eval</span><span class="p">:</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">times</span><span class="p">:</span> <span class="n"><span title="typing.Optional">Optional</span></span><span class="p">[</span><span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">times</span><span class="p">:</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">method</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;sl_cube&quot;</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Tuple">Tuple</span></span><span class="p">[</span><span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">,</span> <span class="n"><span title="numpy.ndarray">ndarray</span></span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -929,9 +929,7 @@ path is constructed based on the sector, camera, and CCD.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>times</code></b>
-              (<code><span title="numpy.ndarray">ndarray</span></code>, default:
-                  <code>None</code>
-)
+              (<code><span title="numpy.ndarray">ndarray</span></code>)
           –
           <div class="doc-md-description">
             <p>Array of times for evaluation.</p>
@@ -953,10 +951,17 @@ path is constructed based on the sector, camera, and CCD.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="numpy.ndarray">ndarray</span></code>
-          –
+<b><code>sl_flux</code></b> (              <code><span title="numpy.ndarray">ndarray</span></code>
+)          –
           <div class="doc-md-description">
-            <p>Scatter light fluxes at the specified pixels and times.</p>
+            <p>Scatter light flux at the specified pixels and times.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+<b><code>sl_fluxerr</code></b> (              <code><span title="numpy.ndarray">ndarray</span></code>
+)          –
+          <div class="doc-md-description">
+            <p>Scatter light flux error at the specified pixels and times.</p>
           </div>
         </li>
     </ul>
@@ -980,6 +985,17 @@ path is constructed based on the sector, camera, and CCD.</p>
         </li>
     </ul>
 
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>(5/9/2025)
+The errors returned by the <code>sl_cube</code> method, which are computed by interpolating 
+a downsize version of the SL errors agregation done in <code>tess_backml.BacgroundData</code>
+is not a propper account for the real uncertainties of the evaluated SL flux,
+as the this does not account for the uncertainties of interpolation modeling. 
+A better interpolation model could be done by using a linear modeling as done in 
+PSFMachine. This option will be developed soon.</p>
+</details>
 
     </div>
 
