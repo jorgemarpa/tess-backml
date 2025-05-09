@@ -492,6 +492,7 @@ class BackgroundCube(object):
         else:
             # if no error collection we use Poison approx
             self.scatter_err_cube = np.sqrt(flux_cube) / pixel_counts
+        self.scatter_err_cube = self.scatter_err_cube.astype(np.float32)
         
         return
 
@@ -835,7 +836,7 @@ class BackgroundCube(object):
         prihdu.header["timbinm"] = ("mean", "Method of binning in time")
         prihdu.header["timsize"] = (cube_sets.shape[1], "Cube size in time axis")
         
-        imghdu = fits.ImageHDU(cube_sets.T, name="Scatter Light Cube")
+        imghdu = fits.ImageHDU(cube_sets.T.astype(np.float32), name="Scatter Light Cube")
         pcthdu = fits.ImageHDU(self.pixel_counts, name="Pixel Counts")
         
         timhdu = fits.BinTableHDU.from_columns(
