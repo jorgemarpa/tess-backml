@@ -1,14 +1,13 @@
 import os
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 from astropy.io import fits
-from scipy.interpolate import RectBivariateSpline, interp1d
 from tesscube import TESSCube
 from tqdm import tqdm
 
+from .utils import interp_1d, interp_2d
 from . import log
-
 
 class ScatterLightCorrector:
     """
@@ -37,7 +36,8 @@ class ScatterLightCorrector:
         self.btjd0 = 2457000
 
         if fname is None:
-            fname = f"./data/ffi_sl_cube_sector{self.sector:03}_{self.camera}-{self.ccd}.fits"
+            # fname = f"./data/ffi_sl_cube_sector{self.sector:03}_{self.camera}-{self.ccd}.fits"
+            raise ValueError("Input file name is not valid, please provide a valid file.")
 
         if not os.path.isfile(fname):
             raise FileNotFoundError(f"SL cube file not found {fname}")
@@ -60,15 +60,16 @@ class ScatterLightCorrector:
         )
         self.image_binsize = hdul[0].header["PIXBIN"]
         self.cube_time = hdul[3].data["time"]
-        self.cube_sl = hdul[1].data.T[0]
-        self.cube_sle = hdul[1].data.T[1]
+        self.cube_flux = hdul[1].data.T[0]
+        self.cube_fluxerr = hdul[1].data.T[1]
+        self.pixel_counts = hdul[2].data
         self.tmin = hdul[0].header["TSTART"] + self.btjd0
         self.tmax = hdul[0].header["TSTOP"] + self.btjd0
 
-        self.row_cube = (
+        self.cube_row = (
             np.arange(self.rmin, self.rmax, self.image_binsize) + self.image_binsize / 2
         )
-        self.col_cube = (
+        self.cube_col = (
             np.arange(self.cmin, self.cmax, self.image_binsize) + self.image_binsize / 2
         )
 
@@ -91,7 +92,7 @@ class ScatterLightCorrector:
 
     def _interpolate_pixel(
         self, row_eval: np.ndarray, col_eval: np.ndarray
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Interpolate the SL model data into the provided pixel grid.
 
@@ -104,53 +105,79 @@ class ScatterLightCorrector:
 
         Returns
         -------
-        np.ndarray
-            Interpolated SL model data for the specified pixel grid.
+        flux_pix_interp : np.ndarray
+            The interpolated flux data. Shape is (ntimes, len(row_evla), len(col_eval)).
+        fluxerr_pix_interp : np.ndarray
+            The interpolated flux error data. Shape is (ntimes, len(row_evla), len(col_eval)).
         """
-        sl_eval_pix = []
-        for tdx in tqdm(range(len(self.cube_sl_rel)), desc="Pixel interp"):
-            interp2d = RectBivariateSpline(
-                self.col_cube_rel, self.row_cube_rel, self.cube_sl_rel[tdx].T, kx=3, ky=3
-            )
-            sl_eval_pix.append(interp2d(col_eval, row_eval).T)
+        # iterate over frames to do 2d pixel interpolation
+        flux_pix_interp = []
+        fluxerr_pix_interp = []
+        for tdx in range(len(self.cube_flux_rel)):
+            # print(self.col_cube_rel.shape, self.row_cube_rel.shape, self.cube_flux_rel[tdx].T.shape)
+            flx = interp_2d(
+                x=self.col_cube_rel, 
+                y=self.row_cube_rel, 
+                z=self.cube_flux_rel[tdx].T,
+                x_eval=col_eval, 
+                y_eval=row_eval,
+            ).T
+            flux_pix_interp.append(flx)
+            flxe = interp_2d(
+                x=self.col_cube_rel, 
+                y=self.row_cube_rel, 
+                z=self.cube_fluxerr_rel[tdx].T,
+                x_eval=col_eval, 
+                y_eval=row_eval,
+            ).T
+            fluxerr_pix_interp.append(flxe)
 
-        sl_eval_pix = np.array(sl_eval_pix)
-        return sl_eval_pix
+        flux_pix_interp = np.array(flux_pix_interp)
+        fluxerr_pix_interp = np.array(fluxerr_pix_interp)
+        
+        return flux_pix_interp, fluxerr_pix_interp
 
-    def _interpolate_times(self, times: Optional[np.ndarray] = None) -> np.ndarray:
+    def _interpolate_times(self, times: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Interpolate the SL model data into the provided times.
 
         Parameters
         ----------
-        times : np.ndarray, optional
+        times : np.ndarray
             Array of times for evaluation.
 
         Returns
         -------
-        np.ndarray
-            Interpolated SL model data for the specified times.
+        flux_time_inter : np.ndarray
+            The interpolated flux data. Shape is (len(times), *cube_spatial_shape).
+        fluxerr_time_inter : np.ndarray
+            The interpolated flux error data. Shape is (len(times), *cube_spatial_shape).
         """
-        out_shape = (len(times), self.cube_sl_rel.shape[1], self.cube_sl_rel.shape[2])
+        # compute output shape
+        out_shape = (len(times), self.cube_flux_rel.shape[1], self.cube_flux_rel.shape[2])
 
-        sl_time_inter = []
-        for pix in tqdm(
-            self.cube_sl_rel.reshape((self.cube_sl_rel.shape[0], -1)).T,
-            desc="Time interp",
+        # do time interp for each pixel
+        flux_time_inter = []
+        fluxerr_time_inter = []
+        for flx, flxe in zip(
+            self.cube_flux_rel.reshape((self.cube_flux_rel.shape[0], -1)).T,
+            self.cube_fluxerr_rel.reshape((self.cube_fluxerr_rel.shape[0], -1)).T,
         ):
-            fx = interp1d(
-                self.cube_time_rel, pix, kind="slinear", bounds_error=False, fill_value="extrapolate"
-            )(times)
-            sl_time_inter.append(fx)
-        sl_time_inter = np.array(sl_time_inter).T.reshape(out_shape)
+            flx_i = interp_1d(x=self.cube_time_rel, y=flx, x_eval=times)
+            flux_time_inter.append(flx_i)
+            flxe_i = interp_1d(x=self.cube_time_rel, y=flxe, x_eval=times)
+            fluxerr_time_inter.append(flxe_i)
+        # reshape arrays into 3D
+        flux_time_inter = np.array(flux_time_inter).T.reshape(out_shape)
+        fluxerr_time_inter = np.array(fluxerr_time_inter).T.reshape(out_shape)
 
-        return sl_time_inter
+        return flux_time_inter, fluxerr_time_inter
 
     def _get_relevant_pixels_and_times(
         self,
         row_eval: np.ndarray,
         col_eval: np.ndarray,
-        times: Optional[np.ndarray] = None,
+        times: np.ndarray,
     ):
         """
         Retrieve the relevant pixels and times for interpolation.
@@ -161,9 +188,10 @@ class ScatterLightCorrector:
             Array of row indices for evaluation.
         col_eval : np.ndarray
             Array of column indices for evaluation.
-        times : np.ndarray, optional
+        times : np.ndarray
             Array of times for evaluation.
         """
+        # find the cube time range that contains the evaluation times
         dt = 2
         ti = np.maximum(np.where(self.cube_time >= times.min())[0][0] - dt, 0)
         tf = np.minimum(
@@ -171,36 +199,46 @@ class ScatterLightCorrector:
         )
         log.info(f"time index range [{ti}:{tf}]")
 
+        # find the cube pixel row/col range that contains the evaluation pixels
         dxy = 2
         ri = np.maximum(
-            np.where(self.row_cube >= row_eval.min())[0][0] - dxy, 0
+            np.where(self.cube_row >= row_eval.min())[0][0] - dxy, 0
         )
         rf = np.minimum(
-            np.where(self.row_cube <= row_eval.max())[0][-1] + dxy, 
+            np.where(self.cube_row <= row_eval.max())[0][-1] + dxy, 
             self.cube_shape[1] - 1
         )
         ci = np.maximum(
-            np.where(self.col_cube >= col_eval.min())[0][0] - dxy, 0
+            np.where(self.cube_col >= col_eval.min())[0][0] - dxy, 0
         )
         cf = np.minimum(
-            np.where(self.col_cube <= col_eval.max())[0][-1] + dxy, 
+            np.where(self.cube_col <= col_eval.max())[0][-1] + dxy, 
             self.cube_shape[2] - 1
         )
         log.info(f"[row,col] range  [{ri}:{rf}, {ci}:{cf}]")
-        self.cube_sl_rel = self.cube_sl[ti:tf, ri:rf, ci:cf].copy()
-        self.cube_sl_rel_org = self.cube_sl_rel.copy()
-        self.cube_time_rel = self.cube_time[ti:tf]
-        self.row_cube_rel = self.row_cube[ri:rf]
-        self.col_cube_rel = self.col_cube[ci:cf]
+        # assign segments of the SL cube for interp
+        # have to make copies to ensure the original SL cube/times/row/col
+        # are not changed and can be used for other evaluation grids with 
+        # the same corrector obeject.
+        # `cube_flux_rel` and `cube_fluxerr_rel` are updated inplaced by 
+        # the interpolation operations
+        self.cube_flux_rel = self.cube_flux[ti:tf, ri:rf, ci:cf].copy()
+        self.cube_fluxerr_rel = self.cube_fluxerr[ti:tf, ri:rf, ci:cf].copy()
+        self.cube_time_rel = self.cube_time[ti:tf].copy()
+        self.row_cube_rel = self.cube_row[ri:rf].copy()
+        self.col_cube_rel = self.cube_col[ci:cf].copy()
+        # we keep a copy of the original section of the SL cube for later ref/plotting
+        self.cube_flux_rel_org = self.cube_flux_rel.copy()
+        
         return
 
     def evaluate_scatterlight_model(
         self,
         row_eval: np.ndarray,
         col_eval: np.ndarray,
-        times: Optional[np.ndarray] = None,
+        times: np.ndarray,
         method: str = "sl_cube",
-    ) -> np.ndarray:
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Evaluate the scatter light model and compute SL fluxes at given pixels and times.
 
@@ -210,15 +248,17 @@ class ScatterLightCorrector:
             Array of row indices for evaluation.
         col_eval : np.ndarray
             Array of column indices for evaluation.
-        times : np.ndarray, optional
+        times : np.ndarray
             Array of times for evaluation.
         method : str, optional
             Method to use for evaluation. Options are "sl_cube" or "nn". Default is "sl_cube".
 
         Returns
         -------
-        np.ndarray
-            Scatter light fluxes at the specified pixels and times.
+        sl_flux : np.ndarray
+            Scatter light flux at the specified pixels and times.
+        sl_fluxerr : np.ndarray
+            Scatter light flux error at the specified pixels and times.
 
         Raises
         ------
@@ -226,10 +266,22 @@ class ScatterLightCorrector:
             If the evaluation grid or times are out of bounds, or if an invalid method is specified.
         NotImplementedError
             If the "nn" method is selected (not implemented).
+
+        Notes
+        -----
+        (5/9/2025)
+        The errors returned by the `sl_cube` method, which are computed by interpolating 
+        a downsize version of the SL errors agregation done in `tess_backml.BacgroundData`
+        is not a propper account for the real uncertainties of the evaluated SL flux,
+        as the this does not account for the uncertainties of interpolation modeling. 
+        A better interpolation model could be done by using a linear modeling as done in 
+        PSFMachine. This option will be developed soon. 
         """
+        # check inputs are arrays
         if not isinstance(row_eval, np.ndarray) or not isinstance(col_eval, np.ndarray):
             raise ValueError("Pixel row/column for evaluation has to be a numpy array")
 
+        # check row/cl inputs are within CCD range
         if (
             (row_eval.min() < self.rmin)
             or (row_eval.max() > self.rmax)
@@ -239,23 +291,33 @@ class ScatterLightCorrector:
             raise ValueError(
                 f"The evaluation pixel grid must be within CCD range [{self.rmin}:{self.rmax}, {self.cmin},{self.cmax}]"
             )
+        # check times are within sector observing times
         if (times.min() < self.tmin) or (times.max() > self.tmax):
             raise ValueError(
                 f"Evaluation times must be within observing times [{self.tmin:.5f}:{self.tmax:.5f}]"
             )
 
+        # do interp from SL cube
         if method == "sl_cube":
+            # get SLcube pixels near the the evaluation grid
             self._get_relevant_pixels_and_times(
                 row_eval=row_eval, col_eval=col_eval, times=times
             )
+            # do time interp
             if self.time_binned:
-                self.cube_sl_rel = self._interpolate_times(times=times)
-                self.cube_sl_rel_times = self.cube_sl_rel.copy()
-            sl_eval = self._interpolate_pixel(row_eval=row_eval, col_eval=col_eval)
+                self.cube_flux_rel, self.cube_fluxerr_rel = self._interpolate_times(times=times)
+                # safekeeping copy of time interpolated low-pixel-res of the cube
+                self.cube_flux_rel_times = self.cube_flux_rel.copy()
+            # do pixel interp
+            sl_flux, sl_fluxerr = self._interpolate_pixel(row_eval=row_eval, col_eval=col_eval)
+            # THIS IS NOT CORRRECT
+            # account for pixel binning error prop
+            sl_fluxerr *= self.image_binsize
 
+        # use NN model for evaluation
         elif method == "nn":
             raise NotImplementedError
         else:
             raise ValueError("Invalid method, must be one of [sl_cube, nn]")
 
-        return sl_eval
+        return sl_flux, sl_fluxerr

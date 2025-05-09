@@ -5,6 +5,7 @@ import numpy as np
 from astropy.visualization import simple_norm
 from matplotlib import animation, axes, colors
 from tqdm import tqdm
+from scipy.interpolate import RectBivariateSpline, interp1d
 
 
 def pooling_2d(
@@ -425,3 +426,84 @@ def has_bit(quality_array: np.ndarray, bit: int) -> np.ndarray:
 
     mask = np.array([int_to_binary_array(int(x), 16)[-bit] for x in quality_array], dtype=bool)
     return mask
+
+def interp_1d(x: np.ndarray, y: np.ndarray, x_eval: np.ndarray) -> np.ndarray:
+    """
+    Performs 1D linear interpolation or extrapolation.
+
+    This function uses `scipy.interpolate.interp1d` with 'slinear' kind
+    for interpolation. It allows extrapolation by setting `fill_value`
+    to "extrapolate".
+
+    Parameters
+    ----------
+    x : np.ndarray
+        A 1-D array of real values (the x-coordinates of the data points).
+        Must be sorted in ascending order.
+    y : np.ndarray
+        A 1-D array of real values (the y-coordinates of the data points).
+        Must have the same length as `x`.
+    x_eval : np.ndarray
+        A 1-D array of real values at which to evaluate the interpolated
+        function.
+
+    Returns
+    -------
+    np.ndarray
+        An array of the same shape as `x_eval` containing the interpolated
+        values.
+    """
+    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray) or not isinstance(x_eval, np.ndarray):
+        raise TypeError("Inputs x, y, and x_eval must be NumPy arrays.")
+    if x.shape != y.shape:
+        raise ValueError(f"Input arrays x and y must have the same shape, but got {x.shape} and {y.shape}.")
+        
+    fn = interp1d(
+        x, y, kind="quadratic", bounds_error=False, fill_value="extrapolate"
+    )
+    return fn(x_eval)
+
+def interp_2d(
+    x: np.ndarray,
+    y: np.ndarray, 
+    z: np.ndarray, 
+    x_eval: np.ndarray, 
+    y_eval: np.ndarray
+) -> np.ndarray:
+    """
+    Performs 1D linear interpolation or extrapolation.
+
+    This function uses `scipy.interpolate.interp1d` with 'slinear' kind
+    for interpolation. It allows extrapolation by setting `fill_value`
+    to "extrapolate".
+
+    Parameters
+    ----------
+    x : np.ndarray
+        A 1-D array of real values (the x-coordinates of the data points).
+        Must be sorted in ascending order.
+    y : np.ndarray
+        A 1-D array of real values (the y-coordinates of the data points).
+        Must have the same length as `x`.
+    x_eval : np.ndarray
+        A 1-D array of real values at which to evaluate the interpolated
+        function.
+
+    Returns
+    -------
+    np.ndarray
+        An array of the same shape as `x_eval` containing the interpolated
+        values.
+    """
+    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray) or not isinstance(z, np.ndarray):
+        raise TypeError("Inputs x, y, and z must be NumPy arrays.")
+    if not isinstance(x_eval, np.ndarray) or not isinstance(y_eval, np.ndarray):
+        raise TypeError("Inputs x_eval and y_eval must be NumPy arrays.")
+
+    if x.shape[0] != z.shape[0]:
+        raise ValueError(f"Input arrays x and z must have the same shape in axis 1.")
+    if y.shape[0] != z.shape[1]:
+        raise ValueError(f"Input arrays y and z must have the same shape in axis 2.")
+        
+    fn = RectBivariateSpline(x, y, z, kx=3, ky=3)
+    return fn(x_eval, y_eval)
