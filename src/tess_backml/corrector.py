@@ -216,6 +216,13 @@ class ScatterLightCorrector:
             np.where(self.cube_col <= col_eval.max())[0][-1] + dxy,
             self.cube_shape[2] - 1,
         )
+        # check we have > 3 points in each axis so 2d pixel interp can use deg=3
+        if rf - ri < 4:
+            ri = np.maximum(ri - 1, 0)
+            rf = np.minimum(rf + 1, self.cube_shape[1] - 1)
+        if cf - ci < 4:
+            ci = np.maximum(ci - 1, 0)
+            cf = np.minimum(cf + 1, self.cube_shape[2] - 1)
         log.info(f"[row,col] range  [{ri}:{rf}, {ci}:{cf}]")
         # assign segments of the SL cube for interp
         # have to make copies to ensure the original SL cube/times/row/col
