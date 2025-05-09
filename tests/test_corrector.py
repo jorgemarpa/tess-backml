@@ -1,6 +1,7 @@
 import os
+
 import numpy as np
-from tess_backml import ScatterLightCorrector, PACKAGEDIR
+from tess_backml import PACKAGEDIR, ScatterLightCorrector
 
 data_path = os.path.dirname(os.path.dirname(PACKAGEDIR))
 
