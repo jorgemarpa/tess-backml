@@ -948,6 +948,10 @@ class BackgroundCube(object):
             plot_cube = self.scatter_cube
             title = "Scatter Light"
             cbar_label = "Flux [e-/s]",
+        elif data in ["sl_tbin", "sl_bin"]:
+            plot_cube = self.scatter_cube_bin
+            title = "Scatter Light"
+            cbar_label = "Flux [e-/s]",
         elif data in ["earth_alt", "earth_elev"]:
             plot_cube = self.earth_maps["alt"] / self.earth_vectors["alt"][:, None, None]
             title = "Earth Elevation Angle"
