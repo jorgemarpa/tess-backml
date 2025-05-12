@@ -10,7 +10,7 @@ packages = [{include = "tess_backml", from = "src"}]
 python = ">3.10,<4.0"
 numpy = ">1.20,<3.0"
 pandas = "^2.2.3"
-matplotlib = "^3.10.1"
+matplotlib = "^3.10.3"
 astropy = ">=5.0,<7.0"
 tqdm = "^4.67.1"
 scipy = "^1.15.2"
