@@ -19,7 +19,7 @@ tessvectors = {git = "https://github.com/jorgemarpa/tessvectors.git", branch="as
 
 [tool.poetry.group.dev.dependencies]
 mkdocs = "^1.6.0"
-mkdocs-material = "^9.5.0"
+mkdocs-material = "^9.6.12"
 mkdocstrings = {version = "^0.29.0", extras = ["python", "numpy-style"]}
 mkdocs-jupyter = "^0.25.1"
 ruff = "^0.5.5"
