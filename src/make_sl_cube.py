@@ -32,7 +32,7 @@ def build_dataset(
             f"{fig_dir}/ffi_slcube_sector{cube.sector:03}_{cube.camera}-{cube.ccd}"
             f"_bin{cube.img_bin}_{int(time_bin)}h.gif"
             )
-        log.info(f"Time binning...")
+        log.info("Time binning...")
         cube.bin_time_axis(bin_size=time_bin)
         log.info(f"Saving animation to {fig_file}")
         cube.animate_data(data="sl_bin", file_name=fig_file, save=True, step=4)
