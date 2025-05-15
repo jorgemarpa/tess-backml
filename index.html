@@ -823,12 +823,14 @@
 <h1 id="tess-back-ml">TESS Back ML</h1>
 <h2 id="tldr">TL,DR</h2>
 <p>This is a Python package to create specialized support data from the TESS Full Frame Image (FFI).
-With <code>tess-backml</code> you can isolate the scatter light (SL) contribution to FFIs and create downsize versions of the cubes for multiple uses: 
-- One use is to correct the SL signal in any FFI cutout by interpolating from a downsize version of the 
-cube. 
-- Another use is to create a machine learning training set with the SL cube and pixel maps of how the
-Earth and Moon angles change during sector observations. These two are the main contributions to the background signal. 
-- This package, also will enable ML model evaluation to correct the scatter light on the fly.</p>
+With <code>tess-backml</code> you can isolate the scatter light (SL) contribution to FFIs and create downsize versions of the cubes for multiple uses: </p>
+<ul>
+<li>One use is to correct the SL signal in any FFI cutout by interpolating from a downsize version of the 
+cube. </li>
+<li>Another use is to create a machine learning training set with the SL cube and pixel maps of how the
+Earth and Moon angles change during sector observations. These two are the main contributions to the background signal. </li>
+<li>This package, also will enable ML model evaluation to correct the scatter light on the fly.</li>
+</ul>
 <h2 id="install">Install</h2>
 <p>Install from this GitHub repository with</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip install git+https://github.com/jorgemarpa/tess-backml
