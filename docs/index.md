@@ -4,6 +4,7 @@
 
 This is a Python package to create specialized support data from the TESS Full Frame Image (FFI).
 With `tess-backml` you can isolate the scatter light (SL) contribution to FFIs and create downsize versions of the cubes for multiple uses: 
+
 - One use is to correct the SL signal in any FFI cutout by interpolating from a downsize version of the 
 cube. 
 - Another use is to create a machine learning training set with the SL cube and pixel maps of how the
