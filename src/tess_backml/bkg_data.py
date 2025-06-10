@@ -8,7 +8,6 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tessvectors
 from astropy import constants as const
 from astropy.io import fits
 from astropy.stats import sigma_clip
@@ -17,7 +16,7 @@ from tesscube import TESSCube
 from tqdm import tqdm
 
 from . import PACKAGEDIR, __version__, log
-from .utils import animate_cube, fill_nans_interp, has_bit, pooling_2d
+from .utils import animate_cube, fill_nans_interp, has_bit, pooling_2d, get_tess_vectors
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -644,10 +643,12 @@ class BackgroundCube(object):
         object_az_map = np.array(object_az_map)
         object_dist_map = np.array(object_dist_map)
 
-        if object_alt_map.shape != self.scatter_cube.shape:
-            raise ValueError(
-                f"The resulting maps have different shape as the scatter cube {object_alt_map.shape}!= {self.scatter_cube.shape}"
-            )
+        if hasattr(self, "scatter_cube"):
+            if object_alt_map.shape != self.scatter_cube.shape:
+                raise ValueError(
+                    "The resulting maps have different shape as the scatter cube "
+                    f"{object_alt_map.shape}!= {self.scatter_cube.shape}"
+                )
 
         # we need to flip the value maps to account for cam/CCD orientations
         if self.camera in [1, 2]:
@@ -720,7 +721,9 @@ class BackgroundCube(object):
             If False, they represent physical distance ([m] for maps).
             Default is True.
         """
-        self.vectors = tessvectors.getvector(("FFI", self.sector, self.camera))
+        self.vectors = get_tess_vectors(
+            cadence="FFI", sector=self.sector, camera=self.camera
+        )
 
         self.earth_maps = self._get_object_vectors(object="Earth", ang_size=ang_size)
         self.earth_vectors = {

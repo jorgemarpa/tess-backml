@@ -2,6 +2,7 @@ from typing import Callable, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from astropy.visualization import simple_norm
 from matplotlib import animation, axes, colors
 from scipy.interpolate import RectBivariateSpline, interp1d
@@ -526,3 +527,51 @@ def interp_2d(
 
     fn = RectBivariateSpline(x, y, z, kx=3, ky=3)
     return fn(x_eval, y_eval)
+
+
+def _resolve_remote_file(cadence: str = "FFI", sector: int = 1, camera: int = 1) -> str:
+    """
+    Resolves the remote file URL for TESS vectors based on cadence, sector, and camera.
+    
+    Parameters
+    ----------
+    cadence : str, optional
+        The cadence type, one of ["FFI", "020", "120"], by default "FFI".
+    sector : int, optional
+        The TESS sector number, by default 1.
+    camera : int, optional
+        The TESS camera number, by default 1.
+    
+    Returns
+    -------
+    str
+        The full URL to the TESS vectors CSV file. 
+    """
+    remote_base = "https://heasarc.gsfc.nasa.gov/docs/tess/data/TESSVectors/Vectors/"
+    cadence_folder = f"{cadence}_Cadence/"
+    file_base = f"TessVectors_S{sector:03d}_C{camera}_{cadence}"
+    file_ext = ".csv"
+    fname = remote_base + cadence_folder + file_base + file_ext
+    return fname
+
+def get_tess_vectors(cadence: str = "FFI", sector: int = 1, camera: int = 1) -> pd.DataFrame:
+    """
+    Fetches TESS vectors from the HEASARC database.
+    
+    Parameters
+    ----------
+    cadence : str, optional
+        The cadence type, one of ["FFI", "020", "120"], by default "FFI".
+    sector : int, optional
+        The TESS sector number, by default 1.
+    camera : int, optional
+        The TESS camera number, by default 1.
+    
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the TESS vectors.
+    """
+    fname = _resolve_remote_file(cadence=cadence, sector=sector, camera=camera)
+    vector = pd.read_csv(fname, comment="#", index_col=False)
+    return vector
