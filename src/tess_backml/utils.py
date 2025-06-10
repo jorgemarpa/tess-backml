@@ -532,7 +532,7 @@ def interp_2d(
 def _resolve_remote_file(cadence: str = "FFI", sector: int = 1, camera: int = 1) -> str:
     """
     Resolves the remote file URL for TESS vectors based on cadence, sector, and camera.
-    
+
     Parameters
     ----------
     cadence : str, optional
@@ -541,11 +541,11 @@ def _resolve_remote_file(cadence: str = "FFI", sector: int = 1, camera: int = 1)
         The TESS sector number, by default 1.
     camera : int, optional
         The TESS camera number, by default 1.
-    
+
     Returns
     -------
     str
-        The full URL to the TESS vectors CSV file. 
+        The full URL to the TESS vectors CSV file.
     """
     remote_base = "https://heasarc.gsfc.nasa.gov/docs/tess/data/TESSVectors/Vectors/"
     cadence_folder = f"{cadence}_Cadence/"
@@ -554,10 +554,13 @@ def _resolve_remote_file(cadence: str = "FFI", sector: int = 1, camera: int = 1)
     fname = remote_base + cadence_folder + file_base + file_ext
     return fname
 
-def get_tess_vectors(cadence: str = "FFI", sector: int = 1, camera: int = 1) -> pd.DataFrame:
+
+def get_tess_vectors(
+    cadence: str = "FFI", sector: int = 1, camera: int = 1
+) -> pd.DataFrame:
     """
     Fetches TESS vectors from the HEASARC database.
-    
+
     Parameters
     ----------
     cadence : str, optional
@@ -566,7 +569,7 @@ def get_tess_vectors(cadence: str = "FFI", sector: int = 1, camera: int = 1) -> 
         The TESS sector number, by default 1.
     camera : int, optional
         The TESS camera number, by default 1.
-    
+
     Returns
     -------
     pd.DataFrame

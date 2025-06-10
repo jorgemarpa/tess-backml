@@ -16,7 +16,7 @@ from tesscube import TESSCube
 from tqdm import tqdm
 
 from . import PACKAGEDIR, __version__, log
-from .utils import animate_cube, fill_nans_interp, has_bit, pooling_2d, get_tess_vectors
+from .utils import animate_cube, fill_nans_interp, get_tess_vectors, has_bit, pooling_2d
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
