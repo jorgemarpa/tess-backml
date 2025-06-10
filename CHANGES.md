@@ -1,3 +1,8 @@
+# 0.3.1 (unreleased)
+- Jupyter notebook tutorials animation fixed
+- Make animation for time binned scatter light cube
+- Python script to create SL cube in FITS files
+
 # 0.3.0 ((2025-05-09)
 - Corrector class that uses scatter light cubes in disk to interpolate SL model in a given pixel-time grid
 - Corrector returns interpolated flux and flux errors
