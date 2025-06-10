@@ -1,7 +1,12 @@
-# 0.3.1 (unreleased)
+# 0.3.2 (unreleased)
 - Jupyter notebook tutorials animation fixed
 - Make animation for time binned scatter light cube
 - Python script to create SL cube in FITS files
+
+# 0.3.1 (2-25-06-10)
+- Updating core dependencies to match `tess-asteroids`
+- Remove `tessvectors` and use own implementation to retrieve vector data from HEASARC archive
+- Adding PyPI publish CI
 
 # 0.3.0 ((2025-05-09)
 - Corrector class that uses scatter light cubes in disk to interpolate SL model in a given pixel-time grid
