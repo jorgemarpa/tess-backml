@@ -8,6 +8,7 @@ import os
 __version__ = "0.3.1"
 PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
 
+
 # Configure logging
 def get_logger():
     """
@@ -16,6 +17,7 @@ def get_logger():
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
     return logger
+
 
 log = get_logger()
 

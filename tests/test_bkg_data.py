@@ -21,7 +21,9 @@ def test_BackgroundCube():
 
     bc._get_dark_frame_idx()
 
-    assert all(bc.dark_frames == np.array([626, 627, 629, 628, 630, 631, 632, 633, 634, 635]))
+    assert all(
+        bc.dark_frames == np.array([626, 627, 629, 628, 630, 631, 632, 633, 634, 635])
+    )
     assert bc.darkest_frame == 626
 
     bc._get_star_mask()
