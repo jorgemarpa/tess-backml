@@ -4,7 +4,7 @@ import os
 import matplotlib
 from tess_backml import BackgroundCube, log
 
-matplotlib.rcParams['animation.embed_limit'] = 2**128
+matplotlib.rcParams["animation.embed_limit"] = 2**128
 
 
 def build_dataset(
@@ -15,14 +15,16 @@ def build_dataset(
     # time_bin: int = 1,
     downsize: str = "binning",
     plot: bool = False,
-    out_dir: str= "./",
+    out_dir: str = "./",
 ):
     bkg_data = BackgroundCube(
         sector=sector, camera=camera, ccd=ccd, img_bin=img_bin, downsize=downsize
     )
     log.info(bkg_data)
-    bkg_data.get_scatter_light_cube(frames=None, mask_straps=True, plot=False, rolling=True)
-    
+    bkg_data.get_scatter_light_cube(
+        frames=None, mask_straps=True, plot=False, rolling=True
+    )
+
     if plot:
         fig_dir = f"{out_dir}/figures/sector{sector:03}"
         if not os.path.isdir(fig_dir):
@@ -30,7 +32,7 @@ def build_dataset(
         fig_file = (
             f"{fig_dir}/ffi_scatterlight_bin{bkg_data.img_bin}"
             f"_sector{bkg_data.sector:03}_{bkg_data.camera}-{bkg_data.ccd}.gif"
-            )
+        )
         log.info(f"Saving animation to {fig_file}")
         bkg_data.animate_data(data="sl", file_name=fig_file, save=True, step=10)
 

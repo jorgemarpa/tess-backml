@@ -1,10 +1,10 @@
 import os
 
 import numpy as np
-
 from tess_backml import PACKAGEDIR, ScatterLightCorrector
 
 data_path = os.path.dirname(os.path.dirname(PACKAGEDIR))
+
 
 def test_ScatterLightCorrector():
     sector = 2
@@ -54,4 +54,3 @@ def test_evaluate_scatterlight_model():
     assert flux.shape == (12, 5, 5)
     assert fluxerr.shape == (12, 5, 5)
     assert np.isfinite(flux).all()
-

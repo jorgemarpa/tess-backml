@@ -93,8 +93,7 @@ class BackgroundCube(object):
         img_bin: int = 16,
         downsize: str = "binning",
     ):
-        """
-        """
+        """ """
         self.rmin, self.rmax = 0, 2048
         self.cmin, self.cmax = 45, 2093
         self.btjd0 = 2457000
@@ -137,7 +136,7 @@ class BackgroundCube(object):
         """Return a string representation of the BackgroundCube object."""
         return f"TESS FFI Background object (Sector, Camera, CCD, N times): {self.sector}, {self.camera}, {self.ccd}, {self.nt}"
 
-    def _make_quality_mask(self, bits: list=[3]):
+    def _make_quality_mask(self, bits: list = [3]):
         """
         Idetify specific bits in the quality mask and remove the cadences from the cubes
 
@@ -173,7 +172,9 @@ class BackgroundCube(object):
                 frames = pickle.load(f)
                 if self.sector in frames.keys():
                     if f"{self.camera}-{self.ccd}" in frames[self.sector].keys():
-                        self.dark_frames = frames[self.sector][f"{self.camera}-{self.ccd}"]
+                        self.dark_frames = frames[self.sector][
+                            f"{self.camera}-{self.ccd}"
+                        ]
                         self.darkest_frame = self.dark_frames[0]
                         return
                 else:
@@ -186,10 +187,16 @@ class BackgroundCube(object):
         # FFI pixels and making a median LC
         step = 16
         srow = np.arange(
-            self.rmin + step / 2, self.rmax - step / 2, step, dtype=int,
+            self.rmin + step / 2,
+            self.rmax - step / 2,
+            step,
+            dtype=int,
         )
         scol = np.arange(
-            self.cmin + step / 2, self.cmax - step / 2, step, dtype=int,
+            self.cmin + step / 2,
+            self.cmax - step / 2,
+            step,
+            dtype=int,
         )
         srow_2d, scol_2d = np.meshgrid(srow, scol, indexing="ij")
         sparse_rc = [(r, c) for r, c in zip(srow_2d.ravel(), scol_2d.ravel())][::2]
@@ -202,7 +209,9 @@ class BackgroundCube(object):
         # find darkes and < 3% frame indices
         dark_frames = np.where(self.bkg_lc <= np.percentile(self.bkg_lc, low_per))[0]
         # we remove bad frames from the list
-        dark_frames = dark_frames[np.isin(dark_frames, np.where(self.quality)[0], invert=True)]
+        dark_frames = dark_frames[
+            np.isin(dark_frames, np.where(self.quality)[0], invert=True)
+        ]
         # take the top 10 frames
         self.dark_frames = dark_frames[np.argsort(self.bkg_lc[dark_frames])][:10]
         # take the darkest
@@ -242,7 +251,7 @@ class BackgroundCube(object):
         self.star_mask = ndimage.binary_dilation(star_mask, iterations=dilat_iter)
 
         return
-    
+
     def _get_straps_mask(self, dilat_iter: int = 1):
         """
         Creates a mask for the CCD strap locations based on predefined column indices.
@@ -262,7 +271,9 @@ class BackgroundCube(object):
         # the indices in the file are 1-based in the science portion of the ccd
         self.strap_mask[:, straps["Column"].values - 1] = True
         if dilat_iter > 0:
-            self.strap_mask = ndimage.binary_dilation(self.strap_mask, iterations=dilat_iter)
+            self.strap_mask = ndimage.binary_dilation(
+                self.strap_mask, iterations=dilat_iter
+            )
 
         return
 
@@ -304,9 +315,9 @@ class BackgroundCube(object):
         return
 
     def get_scatter_light_cube(
-        self, 
-        plot: bool = False, 
-        mask_straps: bool = True, 
+        self,
+        plot: bool = False,
+        mask_straps: bool = True,
         frames: Optional[Tuple] = None,
         rolling: bool = True,
         errors: bool = True,
@@ -342,7 +353,7 @@ class BackgroundCube(object):
             - (start, stop, step): Process frames from `start` to `stop` with `step`.
             If None, processes all frames. Default is None.
         rolling: bool, optional
-            If True, pooling downsizing will be done with an iterative rolling windown and stride 
+            If True, pooling downsizing will be done with an iterative rolling windown and stride
             that will match the output desired shape, this will make the downsizing step slower.
             If False, pooling downsizing will use fixed window and stride.
         errors : bool, optional
@@ -430,11 +441,11 @@ class BackgroundCube(object):
                         )
                 else:
                     current = pooling_2d(
-                            current,
-                            kernel_size=self.img_bin,
-                            stride=self.img_bin,
-                            stat=np.nanmedian,
-                        )
+                        current,
+                        kernel_size=self.img_bin,
+                        stride=self.img_bin,
+                        stat=np.nanmedian,
+                    )
                 if errors:
                     # collect errors
                     err = self.tcube.get_ffi(f)[2].data[
@@ -447,20 +458,17 @@ class BackgroundCube(object):
                         stat=np.nanmean,
                     )
                     flux_e_cube.append(err)
-                
 
                 flux_cube.append(current)
             flux_cube = np.array(flux_cube)
             if len(flux_cube) != self.nt:
-                aux = np.zeros((
-                    self.nt, flux_cube.shape[1], flux_cube.shape[2]
-                ))
+                aux = np.zeros((self.nt, flux_cube.shape[1], flux_cube.shape[2]))
                 aux[fi:ff:step] = flux_cube
                 flux_cube = aux
             # count the number of valid pixels in each bin
-            # when rolling is True, the number of pixels that contribuite to a bin is not easy to 
-            # define due to the stride + window side + rolling. In this case we simplify and use 
-            # the full size + stride to approximate the pixel counts. 
+            # when rolling is True, the number of pixels that contribuite to a bin is not easy to
+            # define due to the stride + window side + rolling. In this case we simplify and use
+            # the full size + stride to approximate the pixel counts.
             pixel_counts = np.ones((self.rmax - self.rmin, self.cmax - self.cmin))
             pixel_counts[mask_pixels] = np.nan
             pixel_counts = pooling_2d(
@@ -472,7 +480,9 @@ class BackgroundCube(object):
             # replace bins with zero count with sample values, but keep 0s where the resulting flux is nan
             nzeros = (pixel_counts == 0).sum()
             print(nzeros)
-            pixel_counts[pixel_counts == 0] = np.random.choice(pixel_counts.ravel(), nzeros)
+            pixel_counts[pixel_counts == 0] = np.random.choice(
+                pixel_counts.ravel(), nzeros
+            )
             pixel_counts[np.isnan(flux_cube[0])] = 0
 
         else:
@@ -488,14 +498,15 @@ class BackgroundCube(object):
             # propagate errors
             self.scatter_err_cube = np.array(flux_e_cube)
             # use aprox when dist is close to normal
-            self.scatter_err_cube = 1.253 * (self.scatter_err_cube / np.sqrt(pixel_counts))
+            self.scatter_err_cube = 1.253 * (
+                self.scatter_err_cube / np.sqrt(pixel_counts)
+            )
         else:
             # if no error collection we use Poison approx
             self.scatter_err_cube = np.sqrt(flux_cube) / pixel_counts
         self.scatter_err_cube = self.scatter_err_cube.astype(np.float32)
-        
-        return
 
+        return
 
     def _get_static_scene(self):
         """
@@ -514,12 +525,17 @@ class BackgroundCube(object):
             Indices defining the active CCD area.
         """
         log.info("Computing average static scene from darkes frames...")
-        static = np.median([self.tcube.get_ffi(f)[1].data[
-                self.rmin : self.rmax, self.cmin : self.cmax
-            ] for f in self.dark_frames], axis=0)
-        
+        static = np.median(
+            [
+                self.tcube.get_ffi(f)[1].data[
+                    self.rmin : self.rmax, self.cmin : self.cmax
+                ]
+                for f in self.dark_frames
+            ],
+            axis=0,
+        )
+
         return static
-    
 
     def _get_object_vectors(self, object: str = "Earth", ang_size: bool = True):
         """
@@ -623,7 +639,7 @@ class BackgroundCube(object):
                 aux_dist = aux_dist.to("deg").value
                 aux_dist[aux_dist == 180] = np.nan
             object_dist_map.append(aux_dist)
-        
+
         object_alt_map = np.array(object_alt_map)
         object_az_map = np.array(object_az_map)
         object_dist_map = np.array(object_dist_map)
@@ -708,21 +724,29 @@ class BackgroundCube(object):
 
         self.earth_maps = self._get_object_vectors(object="Earth", ang_size=ang_size)
         self.earth_vectors = {
-            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("m").value[~self.quality],
+            "dist": (self.vectors["Earth_Distance"].values * const.R_earth)
+            .to("m")
+            .value[~self.quality],
             "alt": self.vectors["Earth_Camera_Angle"].values[~self.quality],
             "az": self.vectors["Earth_Camera_Azimuth"].values[~self.quality],
         }
         self.moon_maps = self._get_object_vectors(object="Moon", ang_size=ang_size)
         self.moon_vectors = {
-            "dist": (self.vectors["Earth_Distance"].values * const.R_earth).to("m").value[~self.quality],
+            "dist": (self.vectors["Earth_Distance"].values * const.R_earth)
+            .to("m")
+            .value[~self.quality],
             "alt": self.vectors["Earth_Camera_Angle"].values[~self.quality],
             "az": self.vectors["Earth_Camera_Azimuth"].values[~self.quality],
         }
         if ang_size:
-            self.earth_vectors["dist"] = 2 * np.arctan(const.R_earth.to("m").value / (2 * self.earth_vectors["dist"]))
-            self.earth_vectors["dist"] *= 180. / np.pi
-            self.moon_vectors["dist"] = 2 * np.arctan(const.R_earth.to("m").value / (2 * self.moon_vectors["dist"]))
-            self.moon_vectors["dist"] *= 180. / np.pi
+            self.earth_vectors["dist"] = 2 * np.arctan(
+                const.R_earth.to("m").value / (2 * self.earth_vectors["dist"])
+            )
+            self.earth_vectors["dist"] *= 180.0 / np.pi
+            self.moon_vectors["dist"] = 2 * np.arctan(
+                const.R_earth.to("m").value / (2 * self.moon_vectors["dist"])
+            )
+            self.moon_vectors["dist"] *= 180.0 / np.pi
 
         return
 
@@ -744,20 +768,22 @@ class BackgroundCube(object):
             raise ValueError(
                 f"Bin size must be larger than the median elapsed time between observations {np.median(diff)*24:.2f} H."
             )
-        
+
         # first find data gaps due to downlink
         gaps = np.where(diff > 3 * np.median(diff))[0] + 1
         # avoid bad frames
         bad_frames = np.where(self.quality)[0]
 
-        # compute indices in each bin for time aggregation 
+        # compute indices in each bin for time aggregation
         indices = []
         # we do binning per orbits to account for data discontinuity
         for no, orb in enumerate(np.array_split(np.arange(len(self.time)), gaps)):
             # bin eges in time units
-            time_binedges = np.arange(self.time[orb].min(), self.time[orb].max(), bin_size/24.)
+            time_binedges = np.arange(
+                self.time[orb].min(), self.time[orb].max(), bin_size / 24.0
+            )
             # find indices within time bin
-            for s,f in zip(time_binedges[:-1], time_binedges[1:]):
+            for s, f in zip(time_binedges[:-1], time_binedges[1:]):
                 idx = np.where((self.time >= s) & (self.time < f))[0]
                 idx = idx[np.isin(idx, bad_frames, invert=True)]
                 indices.append(idx)
@@ -765,10 +791,16 @@ class BackgroundCube(object):
             indices.append(np.arange(indices[-1][-1] + 1, orb[-1] + 1))
 
         # agregate cubes/arrays in the time axis
-        self.scatter_cube_bin = np.array([np.mean(self.scatter_cube[x], axis=0) for x in indices])
-        self.scatter_err_cube_bin = np.array([np.mean(self.scatter_err_cube[x], axis=0) for x in indices])
+        self.scatter_cube_bin = np.array(
+            [np.mean(self.scatter_cube[x], axis=0) for x in indices]
+        )
+        self.scatter_err_cube_bin = np.array(
+            [np.mean(self.scatter_err_cube[x], axis=0) for x in indices]
+        )
         self.time_bin = np.array([np.mean(self.time[x], axis=0) for x in indices])
-        self.cadenceno_bin = np.array([np.mean(self.cadenceno[x], axis=0) for x in indices])
+        self.cadenceno_bin = np.array(
+            [np.mean(self.cadenceno[x], axis=0) for x in indices]
+        )
 
         if hasattr(self, "earth_maps") and hasattr(self, "earth_vectors"):
             self.earth_vectors_bin = {}
@@ -818,16 +850,27 @@ class BackgroundCube(object):
             time_col = self.time
 
         priheader = self.tcube.primary_hdu.header.copy()
-        del priheader["NAXIS1"], priheader["NAXIS2"], priheader["NAXIS3"], priheader["NAXIS4"]
-        
+        del (
+            priheader["NAXIS1"],
+            priheader["NAXIS2"],
+            priheader["NAXIS3"],
+            priheader["NAXIS4"],
+        )
+
         prihdu = fits.PrimaryHDU(header=priheader)
 
-        prihdu.header["ORIGIN"] = ("NASA/GSFC", "Institution responsible for creating this file")
-        prihdu.header["DATE"] = (datetime.date.today().isoformat(), "file creation date")
+        prihdu.header["ORIGIN"] = (
+            "NASA/GSFC",
+            "Institution responsible for creating this file",
+        )
+        prihdu.header["DATE"] = (
+            datetime.date.today().isoformat(),
+            "file creation date",
+        )
         prihdu.header["OBJECT"] = ("Scatter Light cube", "Type of data")
         prihdu.header["CREATOR"] = ("tess-backml", "Software of origin")
         prihdu.header["PROCVER"] = (__version__, "Software versin")
-        
+
         prihdu.header["pixbin"] = (self.img_bin, "Bin size in pixel space")
         prihdu.header["pixbinm"] = ("median", "Method of binning in pixel space")
         prihdu.header["imgsizex"] = (cube_sets.shape[2], "Image size in axis X")
@@ -835,18 +878,20 @@ class BackgroundCube(object):
         prihdu.header["timbins"] = (self.time_binsie, "[h] bin size in time axis")
         prihdu.header["timbinm"] = ("mean", "Method of binning in time")
         prihdu.header["timsize"] = (cube_sets.shape[1], "Cube size in time axis")
-        
-        imghdu = fits.ImageHDU(cube_sets.T.astype(np.float32), name="Scatter Light Cube")
+
+        imghdu = fits.ImageHDU(
+            cube_sets.T.astype(np.float32), name="Scatter Light Cube"
+        )
         pcthdu = fits.ImageHDU(self.pixel_counts, name="Pixel Counts")
-        
+
         timhdu = fits.BinTableHDU.from_columns(
             [
                 fits.Column(name="time", array=time_col, format="D", unit="jd"),
             ]
         )
         timhdu.header["binned"] = (self.time_binned, "Is cube binned in time")
-        timhdu.header["EXTNAME"] = ("TIME")
-        
+        timhdu.header["EXTNAME"] = "TIME"
+
         hdul = fits.HDUList([prihdu, imghdu, pcthdu, timhdu])
         if out_file is None:
             return hdul
@@ -947,13 +992,15 @@ class BackgroundCube(object):
         if data == "sl":
             plot_cube = self.scatter_cube
             title = "Scatter Light"
-            cbar_label = "Flux [e-/s]",
+            cbar_label = ("Flux [e-/s]",)
         elif data in ["sl_tbin", "sl_bin"]:
             plot_cube = self.scatter_cube_bin
             title = "Scatter Light"
-            cbar_label = "Flux [e-/s]",
+            cbar_label = ("Flux [e-/s]",)
         elif data in ["earth_alt", "earth_elev"]:
-            plot_cube = self.earth_maps["alt"] / self.earth_vectors["alt"][:, None, None]
+            plot_cube = (
+                self.earth_maps["alt"] / self.earth_vectors["alt"][:, None, None]
+            )
             title = "Earth Elevation Angle"
             cbar_label = "Angle [normalized]"
         elif data == "earth_az":
@@ -961,7 +1008,9 @@ class BackgroundCube(object):
             title = "Earth Azimuth Angle"
             cbar_label = "Angle [normalized]"
         elif data == "earth_dist":
-            plot_cube = self.earth_maps["dist"] / self.earth_vectors["dist"][:, None, None]
+            plot_cube = (
+                self.earth_maps["dist"] / self.earth_vectors["dist"][:, None, None]
+            )
             title = "Earth Angular Size"
             cbar_label = "Angular Size [normalized]"
         else:
