@@ -197,11 +197,14 @@ class ScatterLightCorrector:
             Array of times for evaluation.
         """
         # find the cube time range that contains the evaluation times
-        dt = 2
+        dt = 3 # minimum n times in cube to do 3rd deg interp
         ti = np.maximum(np.where(self.cube_time >= times.min())[0][0] - dt, 0)
-        tf = np.minimum(
-            np.where(self.cube_time <= times.max())[0][-1] + dt, len(self.cube_time)
-        )
+        aux_idx = np.where(self.cube_time <= times.max())[0]
+        if len(aux_idx) == 0:
+            # special case when evluating at the begining of the cube
+            tf = dt + ti
+        else:
+            tf = np.minimum(aux_idx[-1] + dt, len(self.cube_time))
         log.info(f"time index range [{ti}:{tf}]")
 
         # find the cube pixel row/col range that contains the evaluation pixels
