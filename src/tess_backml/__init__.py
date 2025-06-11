@@ -16,7 +16,7 @@ def get_logger():
     Creates a logger
     """
     logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
     return logger
 
 
