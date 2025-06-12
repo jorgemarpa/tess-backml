@@ -1,6 +1,6 @@
 site_name: TESS BackML
 nav:
-  - Home: index.md
+  - Home: README.md
   - API: 
     - bkg_data.md
     - corrector.md
