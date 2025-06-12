@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tess-backml"
-version = "0.3.2"
+version = "0.3.3"
 description = ""
 authors = ["Jorge Martinez-Palomera <jorgemarpa@ug.uchile.cl>"]
 readme = "README.md"
