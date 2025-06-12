@@ -525,7 +525,15 @@ def interp_2d(
     if y.shape[0] != z.shape[1]:
         raise ValueError("Input arrays y and z must have the same shape in axis 2.")
 
-    fn = RectBivariateSpline(x, y, z, kx=3, ky=3)
+    if x.shape[0] <= 3:
+        kx = 1
+    else:
+        kx = 3
+    if y.shape[0] <= 3:
+        ky = 1
+    else:
+        ky = 3
+    fn = RectBivariateSpline(x, y, z, kx=kx, ky=ky)
     return fn(x_eval, y_eval)
 
 
