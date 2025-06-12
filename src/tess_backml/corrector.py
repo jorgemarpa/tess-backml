@@ -198,7 +198,12 @@ class ScatterLightCorrector:
         """
         # find the cube time range that contains the evaluation times
         dt = 3 # minimum n times in cube to do 3rd deg interp
-        ti = np.maximum(np.where(self.cube_time >= times.min())[0][0] - dt, 0)
+        aux_idx = np.where(self.cube_time >= times.min())[0]
+        if len(aux_idx) == 0:
+            # special case when evluating at the end of the cube
+            ti = len(self.cube_time) - 1 - dt
+        else:
+            ti = np.maximum(aux_idx[0] - dt, 0)
         aux_idx = np.where(self.cube_time <= times.max())[0]
         if len(aux_idx) == 0:
             # special case when evluating at the begining of the cube
