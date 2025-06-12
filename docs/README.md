@@ -1,3 +1,8 @@
+[![PyPI](https://img.shields.io/pypi/v/tess-baclml.svg)](https://pypi.python.org/pypi/tess-backml)
+[![pytest](https://github.com/jorgemarpa/tess-backml/actions/workflows/pytest.yaml/badge.svg)](https://github.com/jorgemarpa/tess-backml/actions/workflows/pytest.yaml/) 
+[![ruff](https://github.com/jorgemarpa/tess-backml/actions/workflows/ruff.yaml/badge.svg)](https://github.com/jorgemarpa/tess-backml/actions/workflows/ruff.yaml)
+[![Docs](https://github.com/jorgemarpa/tess-backml/actions/workflows/deploy-mkdocs.yaml/badge.svg)](https://github.com/jorgemarpa/tess-backml/actions/workflows/deploy-mkdocs.yaml)
+
 # TESS Back ML
 
 ## TL,DR
@@ -13,20 +18,24 @@ Earth and Moon angles change during sector observations. These two are the main 
 
 ## Install 
 
-Install from this GitHub repository with
+Install from PyPI
+
+```
+pip install tess-backml
+```
+
+Or directly from this repository
 
 ```
 pip install git+https://github.com/jorgemarpa/tess-backml
 ```
-
-PyPI will available shortly.
 
 ## Scatter Light Cube
 
 This animation shows the scattered light of a TESS FFI. The original 2048 x 2048 pixel 
 image was downsized to 128 x 128 pixels.
 
-![scatt_cube](./figures/ffi_scatterlight_bin16_sector001_3-4.gif)
+![scatt_cube](https://github.com/jorgemarpa/tess-backml/blob/main/docs/figures/ffi_scatterlight_bin16_sector001_3-4.gif)
 
 ## Angle Maps
 
@@ -34,7 +43,7 @@ The next figure shows the vector maps (distance, elevation, and azimuth angles) 
 Earth and Moon with respect to the camera boresight. These maps have the same shape as
 the scatter light cube shown above.
 
-![earth_maps](./figures/earth_vector_maps.png)
+![earth_maps]([./figures/earth_vector_maps.png](https://github.com/jorgemarpa/tess-backml/blob/main/docs/figures/earth_vector_maps.png))
 
 ## Usage
 
