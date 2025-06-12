@@ -43,7 +43,7 @@ The next figure shows the vector maps (distance, elevation, and azimuth angles) 
 Earth and Moon with respect to the camera boresight. These maps have the same shape as
 the scatter light cube shown above.
 
-![earth_maps]([./figures/earth_vector_maps.png](https://github.com/jorgemarpa/tess-backml/blob/main/docs/figures/earth_vector_maps.png))
+![earth_maps](https://github.com/jorgemarpa/tess-backml/blob/main/docs/figures/earth_vector_maps.png)
 
 ## Usage
 
