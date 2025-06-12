@@ -43,7 +43,9 @@ def build_dataset(
     out_file = f"{data_dir}/ffi_slcube_sector{cube.sector:03}_{cube.camera}-{cube.ccd}.fits"
 
     log.info(f"Saving cubes to {out_file}")
-    cube.save_to_fits(out_file=out_file, binned=True)
+    hdul = cube.save_to_fits(out_file=None, binned=True)
+    hdul[0].header["FILEVER"] = ("1.0", "File version")
+    hdul.writeto(out_file, overwrite=True)
     log.info("Done!")
     return
 
