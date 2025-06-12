@@ -1,4 +1,4 @@
-[![PyPI](https://img.shields.io/pypi/v/tess-baclml.svg)](https://pypi.python.org/pypi/tess-backml)
+[![PyPI](https://img.shields.io/pypi/v/tess-backml.svg)](https://pypi.python.org/pypi/tess-backml)
 [![pytest](https://github.com/jorgemarpa/tess-backml/actions/workflows/pytest.yaml/badge.svg)](https://github.com/jorgemarpa/tess-backml/actions/workflows/pytest.yaml/) 
 [![ruff](https://github.com/jorgemarpa/tess-backml/actions/workflows/ruff.yaml/badge.svg)](https://github.com/jorgemarpa/tess-backml/actions/workflows/ruff.yaml)
 [![Docs](https://github.com/jorgemarpa/tess-backml/actions/workflows/deploy-mkdocs.yaml/badge.svg)](https://github.com/jorgemarpa/tess-backml/actions/workflows/deploy-mkdocs.yaml)
