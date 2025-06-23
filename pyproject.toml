@@ -21,7 +21,7 @@ mkdocs = "^1.6.0"
 mkdocs-material = "^9.6.12"
 mkdocstrings = {version = "^0.29.0", extras = ["python", "numpy-style"]}
 mkdocs-jupyter = "^0.25.1"
-ruff = "^0.5.5"
+ruff = "^0.12.0"
 pytest = "^8.3.2"
 
 [build-system]
