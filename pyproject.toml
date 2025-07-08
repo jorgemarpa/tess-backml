@@ -9,7 +9,7 @@ packages = [{include = "tess_backml", from = "src"}]
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 numpy = ">1.26,<3.0"
-pandas = "^2.2.3"
+pandas = "^2.3.1"
 matplotlib = "^3.9.0"
 astropy = ">=5.3.4,<7.0"
 tqdm = "^4.67.1"
