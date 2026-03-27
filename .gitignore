@@ -14,3 +14,4 @@ dist
 .mypy_cache
 data/cubes
 notebooks/data
+notebooks/tess_asteroids_integration.ipynb
